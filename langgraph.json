@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "trial_matcher": "./src/graph/graph.py:graph"
+  },
+  "env": ".env"
+}
