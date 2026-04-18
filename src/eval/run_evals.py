@@ -21,8 +21,8 @@ from langsmith import Client
 from langsmith.evaluation import evaluate
 
 from src.eval.evaluators import (
-    extraction_accuracy,
     eligibility_agreement,
+    extraction_accuracy,
     ranking_quality,
 )
 
@@ -73,6 +73,7 @@ def ensure_dataset(client: Client) -> None:
 def target(inputs: dict) -> dict:
     """Run the graph on a single input and return outputs for evaluation."""
     import asyncio
+
     from src.graph.graph import graph
 
     async def _run():

@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langgraph.checkpoint.memory import MemorySaver  # noqa: E402
+
 from src.graph.graph import builder  # noqa: E402
 
 # CLI needs its own checkpointer for interrupt/resume support
@@ -65,7 +66,7 @@ async def main(patient_text: str, stream_messages: bool = False) -> None:
             elif stream_mode == "messages":
                 # messages stream yields (AIMessageChunk, metadata)
                 msg_chunk, metadata = chunk
-                node = metadata.get("langgraph_node", "")
+                _node = metadata.get("langgraph_node", "")
                 if hasattr(msg_chunk, "content") and msg_chunk.content:
                     print(msg_chunk.content, end="", flush=True)
     else:

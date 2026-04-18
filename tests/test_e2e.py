@@ -11,15 +11,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from src.graph.nodes.eligibility import CriterionAssessment, EligibilityOutput
 from src.graph.state import (
-    CriterionResult,
     PatientProfile,
     Trial,
-    TrialEvaluation,
     TrialMatchState,
 )
-from src.graph.nodes.eligibility import CriterionAssessment, EligibilityOutput
-
 
 # --- Synthetic patient cases ---
 
@@ -162,6 +159,7 @@ async def _run_graph_with_mocks(patient_key: str):
         mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
         from langgraph.checkpoint.memory import MemorySaver
+
         from src.graph.graph import builder
         graph = builder.compile(checkpointer=MemorySaver())
 
@@ -260,6 +258,7 @@ class TestE2EPipelineIntegrity:
             mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
             from langgraph.checkpoint.memory import MemorySaver
+
             from src.graph.graph import builder
             graph = builder.compile(checkpointer=MemorySaver())
 
@@ -300,6 +299,7 @@ class TestE2EPipelineIntegrity:
             mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
             from langgraph.checkpoint.memory import MemorySaver
+
             from src.graph.graph import builder
             graph = builder.compile(checkpointer=MemorySaver())
 

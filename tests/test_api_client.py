@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import time
-from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -16,7 +15,6 @@ from src.tools.clinical_trials_api import (
     _split_criteria,
     search_trials,
 )
-
 
 # --- _split_criteria ---
 

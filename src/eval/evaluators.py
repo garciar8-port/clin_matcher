@@ -90,12 +90,10 @@ def eligibility_agreement(run: Run, example: Example) -> dict:
 
     for ev in valid:
         if isinstance(ev, dict):
-            met = len(ev.get("criteria_met", []))
             failed = len(ev.get("criteria_failed", []))
             uncertain = len(ev.get("criteria_uncertain", []))
             eligible = ev.get("eligible", "")
         else:
-            met = len(ev.criteria_met)
             failed = len(ev.criteria_failed)
             uncertain = len(ev.criteria_uncertain)
             eligible = ev.eligible

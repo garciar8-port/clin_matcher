@@ -74,8 +74,8 @@ class TestIntakeNode:
 
     @pytest.mark.asyncio
     async def test_clarification_responses_merged(self, empty_state, mock_intake_llm):
-        from src.graph.state import ClarificationResponse
         from src.graph.nodes.intake import intake_node
+        from src.graph.state import ClarificationResponse
 
         empty_state["clarifications_received"] = [
             ClarificationResponse(question_id="age", answer="55 years old")

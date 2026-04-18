@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM, INTAKE_VERSION
 from src.prompts.eligibility import (
     ELIGIBILITY_HUMAN,
     ELIGIBILITY_SYSTEM,
     ELIGIBILITY_VERSION,
 )
+from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM, INTAKE_VERSION
 from src.prompts.ranker import RANKER_SUMMARY_HUMAN, RANKER_SUMMARY_SYSTEM, RANKER_VERSION
 
 PROMPT_REGISTRY: dict[str, dict] = {

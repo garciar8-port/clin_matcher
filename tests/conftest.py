@@ -7,17 +7,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from src.graph.nodes.eligibility import CriterionAssessment, EligibilityOutput
 from src.graph.state import (
-    Clarification,
     CriterionResult,
     PatientProfile,
-    RankedTrial,
     Trial,
     TrialEvaluation,
     TrialMatchState,
 )
-from src.graph.nodes.eligibility import CriterionAssessment, EligibilityOutput
-
 
 # --- Sample data fixtures ---
 

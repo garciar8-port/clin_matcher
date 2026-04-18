@@ -6,14 +6,13 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from src.graph.state import CriterionResult, Trial, TrialEvaluation
 from src.graph.nodes.ranker import (
     _build_clarification_questions,
     _find_trial,
     _recency_score,
     _score,
 )
-
+from src.graph.state import CriterionResult, Trial, TrialEvaluation
 
 # --- _recency_score ---
 
