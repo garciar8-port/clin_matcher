@@ -15,13 +15,14 @@ from src.graph.state import (
     TrialEvaluation,
     TrialMatchState,
 )
-from src.prompts.ranker import RANKER_SUMMARY_HUMAN, RANKER_SUMMARY_SYSTEM
+from src.prompts.ranker import RANKER_SUMMARY_HUMAN, RANKER_SUMMARY_SYSTEM, RANKER_VERSION
+from src.utils.retry import llm_retry
 
 llm = ChatAnthropic(model="claude-sonnet-4-6-20250514")
 
 
 def _recency_score(trial: Trial) -> float:
-    """Score based on how recently the trial was updated (0.0–1.0)."""
+    """Score based on how recently the trial was updated (0.0-1.0)."""
     try:
         updated = datetime.strptime(trial.last_updated, "%Y-%m-%d")
         days_ago = (datetime.now() - updated).days
@@ -80,11 +81,17 @@ def _build_clarification_questions(
     return questions[:5]  # Cap at 5 questions
 
 
+@llm_retry
+async def _generate_summary_llm(messages: list) -> str:
+    response = await llm.ainvoke(messages)
+    return response.content
+
+
 async def _generate_summary(
     profile, trial: Trial, evaluation: TrialEvaluation
 ) -> str:
     """Generate a plain-language match summary for a patient-trial pair."""
-    response = await llm.ainvoke(
+    return await _generate_summary_llm(
         [
             SystemMessage(content=RANKER_SUMMARY_SYSTEM),
             HumanMessage(
@@ -108,10 +115,9 @@ async def _generate_summary(
             ),
         ]
     )
-    return response.content
 
 
-@traceable(name="ranker_agent", metadata={"node_type": "llm_light"})
+@traceable(name="ranker_agent", metadata={"node_type": "llm_light", "prompt_version": RANKER_VERSION})
 async def ranker_node(state: TrialMatchState) -> dict:
     profile = state["patient_profile"]
     assert profile is not None

@@ -10,7 +10,8 @@ from langsmith import traceable
 from pydantic import BaseModel, Field
 
 from src.graph.state import CriterionResult, Trial, TrialEvaluation, TrialMatchState
-from src.prompts.eligibility import ELIGIBILITY_HUMAN, ELIGIBILITY_SYSTEM
+from src.prompts.eligibility import ELIGIBILITY_HUMAN, ELIGIBILITY_SYSTEM, ELIGIBILITY_VERSION
+from src.utils.retry import llm_retry
 
 MAX_TRIALS = 20
 
@@ -76,9 +77,14 @@ def _build_evaluation(output: EligibilityOutput, nct_id: str) -> TrialEvaluation
     )
 
 
+@llm_retry
+async def _evaluate_llm(messages: list) -> EligibilityOutput:
+    return await structured_llm.ainvoke(messages)
+
+
 async def _evaluate_one(profile_json: str, trial: Trial) -> TrialEvaluation:
     """Evaluate a single trial against the patient profile."""
-    response = await structured_llm.ainvoke(
+    response = await _evaluate_llm(
         [
             SystemMessage(content=ELIGIBILITY_SYSTEM),
             HumanMessage(
@@ -93,7 +99,7 @@ async def _evaluate_one(profile_json: str, trial: Trial) -> TrialEvaluation:
     return _build_evaluation(response, trial.nct_id)
 
 
-@traceable(name="eligibility_evaluator", metadata={"node_type": "llm_heavy"})
+@traceable(name="eligibility_evaluator", metadata={"node_type": "llm_heavy", "prompt_version": ELIGIBILITY_VERSION})
 async def eligibility_node(state: TrialMatchState) -> dict:
     profile = state["patient_profile"]
     assert profile is not None

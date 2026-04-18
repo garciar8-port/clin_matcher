@@ -7,7 +7,8 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 
 from src.graph.state import Clarification, PatientProfile, TrialMatchState
-from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM
+from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM, INTAKE_VERSION
+from src.utils.retry import llm_retry
 
 MAX_INPUT_LENGTH = 5_000
 
@@ -15,7 +16,12 @@ llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
 structured_llm = llm.with_structured_output(PatientProfile)
 
 
-@traceable(name="intake_agent", metadata={"node_type": "extraction"})
+@llm_retry
+async def _extract_profile(messages: list) -> PatientProfile:
+    return await structured_llm.ainvoke(messages)
+
+
+@traceable(name="intake_agent", metadata={"node_type": "extraction", "prompt_version": INTAKE_VERSION})
 async def intake_node(state: TrialMatchState) -> dict:
     raw_input = state["raw_input"]
 
@@ -31,7 +37,7 @@ async def intake_node(state: TrialMatchState) -> dict:
     if len(raw_input) > MAX_INPUT_LENGTH:
         raw_input = raw_input[:MAX_INPUT_LENGTH]
 
-    profile = await structured_llm.ainvoke(
+    profile = await _extract_profile(
         [
             SystemMessage(content=INTAKE_SYSTEM),
             HumanMessage(content=INTAKE_HUMAN.format(raw_input=raw_input)),
