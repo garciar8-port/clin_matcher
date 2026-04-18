@@ -86,7 +86,7 @@ export default function Home() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-8 flex-1">
+    <main className="mx-auto w-full max-w-6xl px-6 py-8 flex-1">
       {/* Input */}
       <section className="mb-8">
         <PatientInput
