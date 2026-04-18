@@ -20,7 +20,7 @@ export default function Home() {
 
   const handleUpdate = useCallback((nodeName: string, data: NodeUpdate) => {
     setCompletedNodes((prev) => [...prev, nodeName]);
-    setTraceEvents((prev) => [...prev, { node: nodeName, timestamp: Date.now(), data }]);
+    setTraceEvents((prev) => [...prev, { node: nodeName, timestamp: Date.now(), data: data as Record<string, unknown> }]);
     setState((prev) => {
       if (prev.status !== "running") return prev;
       return { ...prev, currentNode: nodeName };
