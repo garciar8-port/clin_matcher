@@ -207,10 +207,10 @@ class TestRankerNode:
         assert [r.rank for r in rankings] == list(range(1, len(rankings) + 1))
 
     @pytest.mark.asyncio
-    async def test_uncertain_heavy_triggers_clarification(self, empty_state, sample_trials):
+    async def test_uncertain_heavy_still_ranks(self, empty_state, sample_trials, mock_ranker_llm):
         from src.graph.nodes.ranker import ranker_node
 
-        # Create evaluations with many uncertain criteria per trial
+        # Even with many uncertain criteria, ranker should produce rankings
         heavy_evals = [
             TrialEvaluation(
                 nct_id=trial.nct_id,
@@ -223,30 +223,12 @@ class TestRankerNode:
                 eligible="maybe",
                 reasoning="Too many unknowns",
             )
-            for trial in sample_trials[:4]  # Need >3 uncertain-heavy
-        ] + [
-            TrialEvaluation(
-                nct_id="NCT_EXTRA",
-                criteria_met=[],
-                criteria_failed=[],
-                criteria_uncertain=[
-                    CriterionResult(criterion_text=f"Criterion {j}", met=None, reasoning="?")
-                    for j in range(5)
-                ],
-                eligible="maybe",
-                reasoning="Too many unknowns",
-            )
+            for trial in sample_trials
         ]
 
-        empty_state["candidate_trials"] = sample_trials + [
-            Trial(
-                nct_id="NCT_EXTRA", title="Extra", phase="PHASE2", status="RECRUITING",
-                sponsor="X", inclusion_criteria="", exclusion_criteria="",
-                last_updated="2026-01-01",
-            )
-        ]
+        empty_state["candidate_trials"] = sample_trials
         empty_state["evaluations"] = heavy_evals
         result = await ranker_node(empty_state)
 
-        assert len(result["clarifications_needed"]) > 0
-        assert result["current_node"] == "ranker_agent"
+        assert len(result["rankings"]) == len(sample_trials)
+        assert result["clarifications_needed"] == []

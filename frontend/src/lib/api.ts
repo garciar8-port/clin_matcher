@@ -1,10 +1,6 @@
-/** LangGraph Platform API client for thread and run management. */
+/** FastAPI backend client for thread and run management. */
 
-import { Client } from "@langchain/langgraph-sdk";
-
-const API_URL = process.env.NEXT_PUBLIC_LANGGRAPH_API_URL ?? "http://localhost:8123";
-
-export const client = new Client({ apiUrl: API_URL });
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8123";
 
 export async function createThreadAndRun(
   patientText: string,
@@ -13,33 +9,22 @@ export async function createThreadAndRun(
   onError: (error: string) => void,
 ) {
   try {
-    const thread = await client.threads.create();
-    const threadId = thread.thread_id;
+    // Create thread
+    const threadRes = await fetch(`${API_URL}/threads`, { method: "POST" });
+    if (!threadRes.ok) throw new Error("Failed to create thread");
+    const { thread_id: threadId } = await threadRes.json();
 
-    const stream = client.runs.stream(threadId, "trial_matcher", {
-      input: {
-        raw_input: patientText,
-        candidate_trials: [],
-        evaluations: [],
-        rankings: [],
-        clarifications_needed: [],
-        clarifications_received: [],
-        current_node: "",
-        error_log: [],
-        metadata: {},
-      },
-      streamMode: "updates",
+    // Start run with SSE streaming
+    const runRes = await fetch(`${API_URL}/threads/${threadId}/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: { raw_input: patientText } }),
     });
 
-    for await (const event of stream) {
-      if (event.event === "updates") {
-        const data = event.data as Record<string, Record<string, unknown>>;
-        for (const [nodeName, update] of Object.entries(data)) {
-          onUpdate(nodeName, update);
-        }
-      }
-    }
+    if (!runRes.ok) throw new Error("Failed to start run");
+    if (!runRes.body) throw new Error("No response body");
 
+    await consumeSSE(runRes.body, onUpdate);
     onComplete();
     return threadId;
   } catch (error) {
@@ -57,27 +42,53 @@ export async function resumeThread(
   onError: (error: string) => void,
 ) {
   try {
-    const state = await client.threads.getState(threadId);
-    const resumeValue = responses;
-
-    const stream = client.runs.stream(threadId, "trial_matcher", {
-      input: null,
-      command: { resume: resumeValue },
-      streamMode: "updates",
+    const res = await fetch(`${API_URL}/threads/${threadId}/resume`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ responses }),
     });
 
-    for await (const event of stream) {
-      if (event.event === "updates") {
-        const data = event.data as Record<string, Record<string, unknown>>;
-        for (const [nodeName, update] of Object.entries(data)) {
-          onUpdate(nodeName, update);
-        }
-      }
-    }
+    if (!res.ok) throw new Error("Failed to resume thread");
+    if (!res.body) throw new Error("No response body");
 
+    await consumeSSE(res.body, onUpdate);
     onComplete();
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     onError(message);
+  }
+}
+
+async function consumeSSE(
+  body: ReadableStream<Uint8Array>,
+  onUpdate: (nodeName: string, data: Record<string, unknown>) => void,
+) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+
+    let currentEvent = "";
+    for (const line of lines) {
+      if (line.startsWith("event:")) {
+        currentEvent = line.slice(6).trim();
+      } else if (line.startsWith("data:") && currentEvent === "updates") {
+        try {
+          const data = JSON.parse(line.slice(5).trim());
+          for (const [nodeName, update] of Object.entries(data)) {
+            onUpdate(nodeName, update as Record<string, unknown>);
+          }
+        } catch {
+          // Skip malformed JSON
+        }
+      }
+    }
   }
 }

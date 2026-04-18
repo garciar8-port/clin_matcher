@@ -161,7 +161,9 @@ async def _run_graph_with_mocks(patient_key: str):
         mock_elig.ainvoke = AsyncMock(side_effect=mock_elig_invoke)
         mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
-        from src.graph.graph import graph
+        from langgraph.checkpoint.memory import MemorySaver
+        from src.graph.graph import builder
+        graph = builder.compile(checkpointer=MemorySaver())
 
         config = {"configurable": {"thread_id": f"test_{patient_key}"}}
         initial_state = _build_initial_state(patient_key)
@@ -257,7 +259,9 @@ class TestE2EPipelineIntegrity:
             mock_elig.ainvoke = AsyncMock(return_value=elig_output)
             mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
-            from src.graph.graph import graph
+            from langgraph.checkpoint.memory import MemorySaver
+            from src.graph.graph import builder
+            graph = builder.compile(checkpointer=MemorySaver())
 
             config = {"configurable": {"thread_id": "test_order"}}
             initial = _build_initial_state("nsclc_standard")
@@ -295,7 +299,9 @@ class TestE2EPipelineIntegrity:
             mock_elig.ainvoke = AsyncMock()  # Should not be called
             mock_ranker.ainvoke = AsyncMock(return_value=mock_summary)
 
-            from src.graph.graph import graph
+            from langgraph.checkpoint.memory import MemorySaver
+            from src.graph.graph import builder
+            graph = builder.compile(checkpointer=MemorySaver())
 
             config = {"configurable": {"thread_id": "test_search_error"}}
             initial = _build_initial_state("nsclc_standard")

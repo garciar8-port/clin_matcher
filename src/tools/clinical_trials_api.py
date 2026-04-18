@@ -3,18 +3,13 @@
 from __future__ import annotations
 
 import time
-from functools import lru_cache
+from urllib.parse import urlencode
 
-import httpx
+import aiohttp
 
 from src.graph.state import Trial
 
 CTGOV_BASE = "https://clinicaltrials.gov/api/v2"
-FIELDS = (
-    "NCTId,BriefTitle,Phase,OverallStatus,EligibilityCriteria,"
-    "LocationFacility,LocationCity,LocationState,LocationCountry,"
-    "LeadSponsorName,LastUpdatePostDate,Condition"
-)
 
 # Simple in-memory cache with TTL (24 hours)
 _cache: dict[str, tuple[float, list[Trial]]] = {}
@@ -126,7 +121,7 @@ async def search_trials(
     }
 
     if location:
-        params["filter.geo"] = f"distance({location},100mi)"
+        params["query.locn"] = location
 
     # Check cache
     key = _cache_key(params)
@@ -134,10 +129,11 @@ async def search_trials(
     if cached is not None:
         return cached
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(f"{CTGOV_BASE}/studies", params=params)
-        response.raise_for_status()
-        data = response.json()
+    url = f"{CTGOV_BASE}/studies?{urlencode(params)}"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=30)) as response:
+            response.raise_for_status()
+            data = await response.json()
 
     studies = data.get("studies", [])
     trials = [_parse_trial(s) for s in studies]

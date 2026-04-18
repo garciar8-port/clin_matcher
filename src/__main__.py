@@ -10,7 +10,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.graph.graph import graph  # noqa: E402
+from langgraph.checkpoint.memory import MemorySaver  # noqa: E402
+from src.graph.graph import builder  # noqa: E402
+
+# CLI needs its own checkpointer for interrupt/resume support
+graph = builder.compile(checkpointer=MemorySaver())  # noqa: E402
 
 
 NODE_LABELS = {
@@ -72,11 +76,18 @@ async def main(patient_text: str, stream_messages: bool = False) -> None:
             stream_mode="updates",
         ):
             for node_name, update in event.items():
+                if not isinstance(update, dict):
+                    continue
                 label = NODE_LABELS.get(node_name, node_name)
                 print(f"\n[{label}]")
                 _print_node_update(update)
                 if update.get("rankings"):
                     result = update["rankings"]
+                if update.get("clarifications_needed"):
+                    print("  Clarification needed:")
+                    for c in update["clarifications_needed"]:
+                        print(f"    - {c.question}")
+                        print(f"      ({c.context})")
 
     _print_results(result)
 

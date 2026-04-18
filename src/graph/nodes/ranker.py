@@ -18,7 +18,7 @@ from src.graph.state import (
 from src.prompts.ranker import RANKER_SUMMARY_HUMAN, RANKER_SUMMARY_SYSTEM, RANKER_VERSION
 from src.utils.retry import llm_retry
 
-llm = ChatAnthropic(model="claude-sonnet-4-6-20250514")
+llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
 
 
 def _recency_score(trial: Trial) -> float:
@@ -132,16 +132,7 @@ async def ranker_node(state: TrialMatchState) -> dict:
             "current_node": "ranker_agent",
         }
 
-    # Check if too many uncertain criteria — route to human review
-    uncertain_heavy = [e for e in eligible if len(e.criteria_uncertain) > 3]
-    if len(uncertain_heavy) > 3:
-        questions = _build_clarification_questions(uncertain_heavy, profile)
-        return {
-            "clarifications_needed": questions,
-            "current_node": "ranker_agent",
-        }
-
-    # Score and rank
+    # Score and rank — uncertain criteria are shown in trial cards for user judgment
     scored = []
     for ev in eligible:
         trial = _find_trial(ev.nct_id, trials)

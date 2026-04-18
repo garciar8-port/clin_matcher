@@ -15,7 +15,7 @@ from src.utils.retry import llm_retry
 
 MAX_TRIALS = 20
 
-llm = ChatAnthropic(model="claude-sonnet-4-6-20250514")
+llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
 
 
 class EligibilityOutput(BaseModel):
@@ -112,8 +112,16 @@ async def eligibility_node(state: TrialMatchState) -> dict:
         }
 
     profile_json = profile.model_dump_json(indent=2)
+
+    # Limit concurrency to avoid API rate limits
+    semaphore = asyncio.Semaphore(5)
+
+    async def _eval_with_limit(trial):
+        async with semaphore:
+            return await _evaluate_one(profile_json, trial)
+
     evaluations = await asyncio.gather(
-        *[_evaluate_one(profile_json, trial) for trial in trials]
+        *[_eval_with_limit(trial) for trial in trials]
     )
 
     return {
