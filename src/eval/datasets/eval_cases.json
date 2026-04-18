@@ -1,0 +1,852 @@
+[
+  {
+    "id": "EVAL-001",
+    "input": "72-year-old male with stage IIIB non-small cell lung cancer, adenocarcinoma subtype. EGFR exon 19 deletion positive. PD-L1 TPS 80%. He completed first-line Tagrisso but progressed after 14 months. ECOG performance status is 1. No significant comorbidities. Located in Houston, TX.",
+    "expected_profile": {
+      "age": 72,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IIIB",
+      "prior_therapies": ["osimertinib"],
+      "biomarkers": ["EGFR exon 19 deletion", "PD-L1 TPS 80%"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": "Houston, TX"
+    },
+    "difficulty": "easy",
+    "notes": "Straightforward NSCLC case with brand name drug (Tagrisso) that must be normalized to osimertinib."
+  },
+  {
+    "id": "EVAL-002",
+    "input": "This is a 58 y/o woman who was diagnosed with NSCLC about six months ago. She has an ALK rearrangement and was started on crizotinib but had to stop due to hepatotoxicity. She then received Alecensa for 4 months before imaging showed new brain mets. PS is 2. She has well-controlled type 2 diabetes and hypertension.",
+    "expected_profile": {
+      "age": 58,
+      "sex": "female",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": null,
+      "prior_therapies": ["crizotinib", "alectinib"],
+      "biomarkers": ["ALK rearrangement"],
+      "performance_status": "ECOG 2",
+      "comorbidities": ["type 2 diabetes", "hypertension"],
+      "location": null
+    },
+    "difficulty": "medium",
+    "notes": "Stage not explicitly stated but brain mets imply stage IV. Brand name Alecensa needs normalization. Missing explicit stage."
+  },
+  {
+    "id": "EVAL-003",
+    "input": "Pt is a 65M dx'd with squamous cell carcinoma of the lung, stage IVA. PD-L1 is high, >50%. He received four cycles of Keytruda plus carboplatin/paclitaxel. Now progressing on maintenance Keytruda alone. KPS 70. History of COPD and mild CKD stage 2. Lives in Denver.",
+    "expected_profile": {
+      "age": 65,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IVA",
+      "prior_therapies": ["pembrolizumab", "carboplatin", "paclitaxel"],
+      "biomarkers": ["PD-L1 TPS >50%"],
+      "performance_status": "KPS 70",
+      "comorbidities": ["chronic obstructive pulmonary disease", "chronic kidney disease stage 2"],
+      "location": "Denver, CO"
+    },
+    "difficulty": "medium",
+    "notes": "Uses Keytruda (brand) and abbreviations (dx'd, KPS, CKD). Squamous NSCLC subtype. KPS scale instead of ECOG."
+  },
+  {
+    "id": "EVAL-004",
+    "input": "A 45-year-old never-smoker female presents with stage IV lung adenocarcinoma. Molecular testing revealed a ROS1 fusion. She has not received any systemic therapy yet. ECOG 0. No known comorbidities. Patient lives in San Francisco, CA.",
+    "expected_profile": {
+      "age": 45,
+      "sex": "female",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IV",
+      "prior_therapies": [],
+      "biomarkers": ["ROS1 fusion"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "San Francisco, CA"
+    },
+    "difficulty": "easy",
+    "notes": "Treatment-naive NSCLC with ROS1 fusion. Clean case with all fields present."
+  },
+  {
+    "id": "EVAL-005",
+    "input": "68yo gentleman with lung cancer. He's been on Opdivo for about a year now and things have been pretty stable until his last scan showed some new spots in the liver. His KRAS G12C mutation was confirmed at initial diagnosis. He had chemo before starting nivo - I think it was carbo/pem. He's doing okay functionally, maybe ECOG 1.",
+    "expected_profile": {
+      "age": 68,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": null,
+      "prior_therapies": ["carboplatin", "pemetrexed", "nivolumab"],
+      "biomarkers": ["KRAS G12C"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Very informal clinical language. Opdivo and nivo both refer to nivolumab. Abbreviated drug names (carbo/pem). Vague staging - liver mets suggest stage IV but not stated."
+  },
+  {
+    "id": "EVAL-006",
+    "input": "Patient is a 51-year-old female with stage IB NSCLC, adenocarcinoma. She underwent lobectomy with clear margins and completed four cycles of adjuvant cisplatin/vinorelbine. No targetable mutations found on NGS panel. PD-L1 was 30%. ECOG 0. No comorbidities. Seen at our clinic in Chicago.",
+    "expected_profile": {
+      "age": 51,
+      "sex": "female",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IB",
+      "prior_therapies": ["lobectomy", "cisplatin", "vinorelbine"],
+      "biomarkers": ["PD-L1 TPS 30%"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Chicago, IL"
+    },
+    "difficulty": "easy",
+    "notes": "Early-stage NSCLC with surgical history. Tests whether surgical interventions are captured as prior therapy."
+  },
+  {
+    "id": "EVAL-007",
+    "input": "78F with advanced lung adenoca. She has both an EGFR L858R and a co-occurring TP53 mutation. Started on erlotinib but switched to osimertinib after T790M resistance was detected. Now progressing again after 8 months on osi. ECOG has declined to 3 - she's mostly bedbound. Significant cardiac history with CHF EF 30%. Pt is in Atlanta area.",
+    "expected_profile": {
+      "age": 78,
+      "sex": "female",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": null,
+      "prior_therapies": ["erlotinib", "osimertinib"],
+      "biomarkers": ["EGFR L858R", "TP53 mutation", "EGFR T790M"],
+      "performance_status": "ECOG 3",
+      "comorbidities": ["congestive heart failure"],
+      "location": "Atlanta, GA"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple EGFR mutations including resistance mutation. Poor performance status. Abbreviated terms (adenoca, osi, CHF, EF). Complex biomarker profile."
+  },
+  {
+    "id": "EVAL-008",
+    "input": "44-year-old male diagnosed with stage IIA non-small cell lung cancer, large cell neuroendocrine histology. He is treatment-naive and being evaluated for surgical resection. PD-L1 negative. ECOG 0. No medical history of note. Based in Boston, MA.",
+    "expected_profile": {
+      "age": 44,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IIA",
+      "prior_therapies": [],
+      "biomarkers": ["PD-L1 negative"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Boston, MA"
+    },
+    "difficulty": "easy",
+    "notes": "Rare NSCLC subtype (large cell neuroendocrine). Treatment-naive early stage."
+  },
+  {
+    "id": "EVAL-009",
+    "input": "This 63-year-old man has lung cancer that's spread to bones and adrenals. His oncotype or whatever molecular testing they did showed high PD-L1 (90%) and no driver mutations. He finished 4 cycles of chemo-immunotherapy with carbo, pemetrexed, and Keytruda and is currently on maintenance pembro + pem. Doing well, ECOG 1.",
+    "expected_profile": {
+      "age": 63,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": "IV",
+      "prior_therapies": ["carboplatin", "pemetrexed", "pembrolizumab"],
+      "biomarkers": ["PD-L1 TPS 90%"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "medium",
+    "notes": "Metastatic disease implies stage IV. Mixed brand/generic names (Keytruda and pembro). Confused terminology (oncotype vs NGS). Abbreviated drug names (carbo, pem, pembro)."
+  },
+  {
+    "id": "EVAL-010",
+    "input": "55 yo woman, never smoker, lung adenocarcinoma with MET exon 14 skipping mutation. She progressed on capmatinib after 6 months. Also has a history of well-controlled lupus on hydroxychloroquine. Lives in Portland, Oregon. Performance status ECOG 1.",
+    "expected_profile": {
+      "age": 55,
+      "sex": "female",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": null,
+      "prior_therapies": ["capmatinib"],
+      "biomarkers": ["MET exon 14 skipping"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["systemic lupus erythematosus"],
+      "location": "Portland, OR"
+    },
+    "difficulty": "medium",
+    "notes": "Rare MET alteration. Autoimmune comorbidity relevant for immunotherapy eligibility. Missing stage."
+  },
+  {
+    "id": "EVAL-011",
+    "input": "62-year-old postmenopausal woman with stage IIA invasive ductal carcinoma of the left breast. ER positive (95%), PR positive (80%), HER2 negative by IHC (score 0). Ki-67 is 15%. She underwent lumpectomy with sentinel node biopsy (0/3 nodes positive). Completed adjuvant TC (docetaxel/cyclophosphamide) x4 cycles and is currently on anastrozole. ECOG 0. No significant PMH. Lives in Minneapolis, MN.",
+    "expected_profile": {
+      "age": 62,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IIA",
+      "prior_therapies": ["lumpectomy", "docetaxel", "cyclophosphamide", "anastrozole"],
+      "biomarkers": ["ER positive 95%", "PR positive 80%", "HER2 negative", "Ki-67 15%"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Minneapolis, MN"
+    },
+    "difficulty": "easy",
+    "notes": "Classic ER+/PR+/HER2- breast cancer. All fields clearly stated. Tests biomarker detail extraction (percentages)."
+  },
+  {
+    "id": "EVAL-012",
+    "input": "48F with triple-negative breast cancer, stage IIIC. She completed neoadjuvant AC-T (doxorubicin/cyclophosphamide followed by paclitaxel) and Keytruda, then had mastectomy. Pathology showed residual disease (RCB-III). Now on adjuvant Keytruda. PD-L1 CPS 15. BRCA1 germline mutation found. ECOG 0.",
+    "expected_profile": {
+      "age": 48,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IIIC",
+      "prior_therapies": ["doxorubicin", "cyclophosphamide", "paclitaxel", "pembrolizumab", "mastectomy"],
+      "biomarkers": ["ER negative", "PR negative", "HER2 negative", "PD-L1 CPS 15", "BRCA1 germline mutation"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Triple-negative implies ER-/PR-/HER2- which must be inferred. Complex treatment sequence with neoadjuvant chemo-immunotherapy. AC-T regimen abbreviation. BRCA1 has therapeutic implications."
+  },
+  {
+    "id": "EVAL-013",
+    "input": "71-year-old woman with metastatic HER2-positive breast cancer (IHC 3+). She's had quite a journey - initial diagnosis was stage II, treated with TCHP (Herceptin, Perjeta, docetaxel, carboplatin) then surgery. Recurred 2 years later with liver mets. Got TDM-1 second line for about 9 months. Now progressing. She has mild neuropathy from prior taxane. ECOG 1. Lives outside Philadelphia.",
+    "expected_profile": {
+      "age": 71,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IV",
+      "prior_therapies": ["trastuzumab", "pertuzumab", "docetaxel", "carboplatin", "surgery", "ado-trastuzumab emtansine"],
+      "biomarkers": ["HER2 positive IHC 3+"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["peripheral neuropathy"],
+      "location": "Philadelphia, PA"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple brand names (Herceptin, Perjeta, TDM-1) to normalize. Disease recurrence changes staging. TCHP regimen abbreviation. Neuropathy as comorbidity from prior treatment."
+  },
+  {
+    "id": "EVAL-014",
+    "input": "Premenopausal 39-year-old woman with ER+/HER2- invasive lobular carcinoma, stage IV with bone-only metastases at diagnosis. Started on Ibrance plus letrozole with goserelin for ovarian suppression. Oncotype DX recurrence score 28. No BRCA mutation. ECOG 0. No comorbidities. In New York City.",
+    "expected_profile": {
+      "age": 39,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IV",
+      "prior_therapies": ["palbociclib", "letrozole", "goserelin"],
+      "biomarkers": ["ER positive", "HER2 negative", "Oncotype DX RS 28", "BRCA wild-type"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "New York, NY"
+    },
+    "difficulty": "medium",
+    "notes": "Young patient with de novo metastatic disease. Ibrance brand name. PR status not mentioned. Lobular subtype is less common."
+  },
+  {
+    "id": "EVAL-015",
+    "input": "54F, inflammatory breast cancer, HER2-positive (FISH amplified, ratio 4.2). Completed neoadjuvant TCHP x6, modified radical mastectomy, radiation. Achieved pCR. Currently on adjuvant Herceptin + Perjeta. Also has Hashimoto's thyroiditis on levothyroxine. PS 0. Treated in Miami.",
+    "expected_profile": {
+      "age": 54,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": null,
+      "prior_therapies": ["docetaxel", "carboplatin", "trastuzumab", "pertuzumab", "modified radical mastectomy", "radiation"],
+      "biomarkers": ["HER2 positive FISH amplified"],
+      "performance_status": "ECOG 0",
+      "comorbidities": ["Hashimoto's thyroiditis"],
+      "location": "Miami, FL"
+    },
+    "difficulty": "hard",
+    "notes": "Inflammatory breast cancer is a rare presentation. TCHP abbreviation must be expanded. FISH ratio detail. ER/PR status missing. Stage not explicitly stated."
+  },
+  {
+    "id": "EVAL-016",
+    "input": "67-year-old woman diagnosed last year with early-stage breast cancer - I believe it was stage IA. She's ER-positive, PR-low (5%), HER2-negative. Had a lumpectomy and is on tamoxifen. Genomic testing showed low risk so no chemo was recommended. She's in good shape, ECOG 0. She has osteoporosis. Lives in Seattle.",
+    "expected_profile": {
+      "age": 67,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IA",
+      "prior_therapies": ["lumpectomy", "tamoxifen"],
+      "biomarkers": ["ER positive", "PR positive 5%", "HER2 negative"],
+      "performance_status": "ECOG 0",
+      "comorbidities": ["osteoporosis"],
+      "location": "Seattle, WA"
+    },
+    "difficulty": "easy",
+    "notes": "Early-stage hormone-positive breast cancer. Conversational tone. PR low-positive is still positive."
+  },
+  {
+    "id": "EVAL-017",
+    "input": "A 36-year-old woman with BRCA2-mutated triple-negative breast cancer, stage IIB. She had dose-dense AC followed by weekly paclitaxel as neoadjuvant therapy, then bilateral mastectomy. Had significant residual disease. Now starting adjuvant Lynparza. ECOG 0. No other medical issues. Based in Dallas, TX.",
+    "expected_profile": {
+      "age": 36,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IIB",
+      "prior_therapies": ["doxorubicin", "cyclophosphamide", "paclitaxel", "bilateral mastectomy"],
+      "biomarkers": ["ER negative", "PR negative", "HER2 negative", "BRCA2 germline mutation"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Dallas, TX"
+    },
+    "difficulty": "medium",
+    "notes": "Lynparza brand name for olaparib - but it's being started, so should it count as prior? AC abbreviation must be expanded. BRCA2 mutation relevant for PARP inhibitor eligibility."
+  },
+  {
+    "id": "EVAL-018",
+    "input": "81-year-old woman, ER-strongly-positive breast cancer with bone mets. She's been on Faslodex plus Afinitor for about a year but her markers are rising. HER2 was equivocal on IHC (2+) but FISH was negative. She also has A-fib on Eliquis and moderate renal impairment. Not great functionally - ECOG 2. Seen at our clinic in Phoenix.",
+    "expected_profile": {
+      "age": 81,
+      "sex": "female",
+      "diagnosis": "breast cancer",
+      "stage": "IV",
+      "prior_therapies": ["fulvestrant", "everolimus"],
+      "biomarkers": ["ER positive", "HER2 negative"],
+      "performance_status": "ECOG 2",
+      "comorbidities": ["atrial fibrillation", "chronic kidney disease"],
+      "location": "Phoenix, AZ"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple brand names (Faslodex, Afinitor, Eliquis). HER2 equivocal IHC but FISH-negative means HER2-negative overall. Bone mets imply stage IV. Elderly with multiple comorbidities."
+  },
+  {
+    "id": "EVAL-019",
+    "input": "59-year-old male with stage III colon adenocarcinoma, diagnosed after presenting with bowel obstruction. He underwent right hemicolectomy. Pathology showed T3N2a (5/22 nodes positive). MSI-high on IHC (loss of MLH1/PMS2). KRAS/NRAS/BRAF all wild-type. Completed adjuvant FOLFOX (6 months). ECOG 1. Has well-controlled hypertension. In Cleveland, OH.",
+    "expected_profile": {
+      "age": 59,
+      "sex": "male",
+      "diagnosis": "colorectal cancer",
+      "stage": "III",
+      "prior_therapies": ["right hemicolectomy", "fluorouracil", "leucovorin", "oxaliplatin"],
+      "biomarkers": ["MSI-high", "MLH1 loss", "PMS2 loss", "KRAS wild-type", "NRAS wild-type", "BRAF wild-type"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["hypertension"],
+      "location": "Cleveland, OH"
+    },
+    "difficulty": "medium",
+    "notes": "FOLFOX abbreviation must be expanded to component drugs. MSI-H with specific IHC loss pattern. Comprehensive molecular profiling."
+  },
+  {
+    "id": "EVAL-020",
+    "input": "47-year-old woman with metastatic colorectal cancer - sigmoid primary with synchronous liver mets (bilobar, deemed unresectable). KRAS G12D mutated, MSS, HER2 negative. She's been through FOLFIRI/Avastin first line (12 cycles, then progressed) and is now on Lonsurf. ECOG 1. No major comorbidities aside from iron deficiency anemia. Seen in LA.",
+    "expected_profile": {
+      "age": 47,
+      "sex": "female",
+      "diagnosis": "colorectal cancer",
+      "stage": "IV",
+      "prior_therapies": ["fluorouracil", "leucovorin", "irinotecan", "bevacizumab", "trifluridine/tipiracil"],
+      "biomarkers": ["KRAS G12D", "microsatellite stable", "HER2 negative"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["iron deficiency anemia"],
+      "location": "Los Angeles, CA"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple regimen abbreviations (FOLFIRI, Lonsurf, Avastin). MSS vs MSI distinction. Brand names require normalization. Liver mets imply stage IV."
+  },
+  {
+    "id": "EVAL-021",
+    "input": "72M with rectal cancer, locally advanced (cT3N1). Completed neoadjuvant chemoradiation with capecitabine, then had a low anterior resection with TME. Path showed ypT2N0 - good response. MSI testing was stable. Now doing adjuvant CAPEOX. ECOG 0. Type 2 DM on metformin. In Charlotte, NC.",
+    "expected_profile": {
+      "age": 72,
+      "sex": "male",
+      "diagnosis": "colorectal cancer",
+      "stage": "III",
+      "prior_therapies": ["radiation", "capecitabine", "low anterior resection", "oxaliplatin"],
+      "biomarkers": ["microsatellite stable"],
+      "performance_status": "ECOG 0",
+      "comorbidities": ["type 2 diabetes"],
+      "location": "Charlotte, NC"
+    },
+    "difficulty": "medium",
+    "notes": "Rectal cancer classified under CRC. CAPEOX abbreviation (capecitabine + oxaliplatin). Clinical vs pathological staging. DM abbreviation."
+  },
+  {
+    "id": "EVAL-022",
+    "input": "A 66-year-old man presented with right-sided colon cancer and was found to have a BRAF V600E mutation along with MSI-high status. He has liver and peritoneal metastases. He received first-line FOLFOXIRI plus bevacizumab for 8 cycles, then had disease progression. ECOG 1. History of gout. In Baltimore.",
+    "expected_profile": {
+      "age": 66,
+      "sex": "male",
+      "diagnosis": "colorectal cancer",
+      "stage": "IV",
+      "prior_therapies": ["fluorouracil", "leucovorin", "oxaliplatin", "irinotecan", "bevacizumab"],
+      "biomarkers": ["BRAF V600E", "MSI-high"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["gout"],
+      "location": "Baltimore, MD"
+    },
+    "difficulty": "medium",
+    "notes": "BRAF V600E with MSI-H is a specific CRC subgroup. FOLFOXIRI is a complex regimen abbreviation. Right-sided colon cancer has prognostic significance."
+  },
+  {
+    "id": "EVAL-023",
+    "input": "55F with CRC, mets to lungs only. She had her primary sigmoid tumor resected two years ago. KRAS/NRAS wild-type, HER2 amplified (rare in CRC). MSS. She's failed FOLFOX + cetux and then FOLFIRI + Avastin. Now we're considering HER2-directed therapy. PS 1. No comorbidities.",
+    "expected_profile": {
+      "age": 55,
+      "sex": "female",
+      "diagnosis": "colorectal cancer",
+      "stage": "IV",
+      "prior_therapies": ["sigmoid resection", "fluorouracil", "leucovorin", "oxaliplatin", "cetuximab", "irinotecan", "bevacizumab"],
+      "biomarkers": ["KRAS wild-type", "NRAS wild-type", "HER2 amplified", "microsatellite stable"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Rare HER2 amplification in CRC. Abbreviated drug names (cetux). Multiple regimen abbreviations. CRC abbreviation. Lung-only mets has clinical significance for potential oligometastatic approach."
+  },
+  {
+    "id": "EVAL-024",
+    "input": "A 63-year-old gentleman with stage IVB sigmoid colon cancer with extensive peritoneal carcinomatosis. Molecular profile: KRAS wild-type, BRAF wild-type, MSS, HER2 non-amplified. He completed 12 cycles of FOLFOX with panitumumab as first-line and had a partial response. ECOG performance status 1. Has chronic hepatitis B on entecavir. Lives near Tampa, Florida.",
+    "expected_profile": {
+      "age": 63,
+      "sex": "male",
+      "diagnosis": "colorectal cancer",
+      "stage": "IVB",
+      "prior_therapies": ["fluorouracil", "leucovorin", "oxaliplatin", "panitumumab"],
+      "biomarkers": ["KRAS wild-type", "BRAF wild-type", "microsatellite stable", "HER2 non-amplified"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["chronic hepatitis B"],
+      "location": "Tampa, FL"
+    },
+    "difficulty": "easy",
+    "notes": "Well-structured case with comprehensive molecular data. Hepatitis B is relevant for immunotherapy considerations."
+  },
+  {
+    "id": "EVAL-025",
+    "input": "38 year old female with Lynch syndrome (MSH2 germline mutation) and newly diagnosed colon cancer with liver mets - we just confirmed it's MSI-H as expected. She hasn't started any treatment yet. She's otherwise healthy and fit, ECOG 0. Located in Austin, TX.",
+    "expected_profile": {
+      "age": 38,
+      "sex": "female",
+      "diagnosis": "colorectal cancer",
+      "stage": "IV",
+      "prior_therapies": [],
+      "biomarkers": ["MSI-high", "MSH2 germline mutation", "Lynch syndrome"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Austin, TX"
+    },
+    "difficulty": "easy",
+    "notes": "Treatment-naive CRC with Lynch syndrome. Young patient with hereditary predisposition. MSI-H makes her a good candidate for immunotherapy."
+  },
+  {
+    "id": "EVAL-026",
+    "input": "57-year-old male with unresectable stage IIIC cutaneous melanoma of the right thigh. BRAF V600E mutant. LDH elevated. He completed adjuvant Opdivo after initial wide local excision but recurred within 6 months with in-transit metastases. ECOG 0. No significant medical history. Located in San Diego, CA.",
+    "expected_profile": {
+      "age": 57,
+      "sex": "male",
+      "diagnosis": "melanoma",
+      "stage": "IIIC",
+      "prior_therapies": ["wide local excision", "nivolumab"],
+      "biomarkers": ["BRAF V600E", "LDH elevated"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "San Diego, CA"
+    },
+    "difficulty": "medium",
+    "notes": "Melanoma recurring after adjuvant immunotherapy. BRAF mutation opens targeted therapy options. Opdivo brand name. LDH is prognostic."
+  },
+  {
+    "id": "EVAL-027",
+    "input": "This 64 y/o woman has metastatic melanoma to brain and lungs. She started on ipi/nivo combo (Yervoy plus Opdivo) about 3 months ago and had a mixed response - brain lesions shrank but lung mets are growing. BRAF wild-type. PD-L1 is around 40%. ECOG 1. She also has autoimmune thyroiditis that flared on immunotherapy. In NYC.",
+    "expected_profile": {
+      "age": 64,
+      "sex": "female",
+      "diagnosis": "melanoma",
+      "stage": "IV",
+      "prior_therapies": ["ipilimumab", "nivolumab"],
+      "biomarkers": ["BRAF wild-type", "PD-L1 40%"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["autoimmune thyroiditis"],
+      "location": "New York, NY"
+    },
+    "difficulty": "medium",
+    "notes": "Mixed response scenario. Multiple brand names (Yervoy, Opdivo) and abbreviation (ipi/nivo). Autoimmune comorbidity relevant for immunotherapy. Brain mets."
+  },
+  {
+    "id": "EVAL-028",
+    "input": "72M, uveal melanoma diagnosed 3 years ago s/p enucleation of the left eye. Now presents with multiple liver metastases. GNAQ mutation positive. No BRAF mutation. He was started on tebentafusp but it's only approved for HLA-A*02:01 positive patients, which he is. ECOG 1. Has controlled HTN and BPH. In Philadelphia.",
+    "expected_profile": {
+      "age": 72,
+      "sex": "male",
+      "diagnosis": "uveal melanoma",
+      "stage": "IV",
+      "prior_therapies": ["enucleation", "tebentafusp"],
+      "biomarkers": ["GNAQ mutation", "BRAF wild-type", "HLA-A*02:01 positive"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["hypertension", "benign prostatic hyperplasia"],
+      "location": "Philadelphia, PA"
+    },
+    "difficulty": "hard",
+    "notes": "Uveal melanoma is distinct from cutaneous. Rare biomarker (GNAQ). HLA typing as biomarker. Abbreviations (s/p, HTN, BPH). Tebentafusp is a bispecific."
+  },
+  {
+    "id": "EVAL-029",
+    "input": "49-year-old woman with acral melanoma of the right heel, now metastatic to inguinal nodes and lungs. BRAF V600K (note: K not E). c-KIT mutation also detected. She's failed first-line pembrolizumab - progressed after 4 months. ECOG 1. No comorbidities. Lives in Nashville, TN.",
+    "expected_profile": {
+      "age": 49,
+      "sex": "female",
+      "diagnosis": "melanoma",
+      "stage": "IV",
+      "prior_therapies": ["pembrolizumab"],
+      "biomarkers": ["BRAF V600K", "c-KIT mutation"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": "Nashville, TN"
+    },
+    "difficulty": "medium",
+    "notes": "Acral melanoma subtype. BRAF V600K (not V600E) - less common variant. c-KIT mutation has therapeutic implications. Tests precision in biomarker extraction."
+  },
+  {
+    "id": "EVAL-030",
+    "input": "83-year-old man with mucosal melanoma of the nasal cavity. Locally advanced, unresectable. No BRAF or NRAS mutations. PD-L1 negative. He received 2 cycles of ipilimumab + nivolumab but couldn't tolerate it due to grade 3 colitis. Then switched to single-agent nivolumab but progressed. ECOG 2. Multiple comorbidities including COPD, coronary artery disease with prior CABG, and chronic kidney disease stage 3. In Pittsburgh.",
+    "expected_profile": {
+      "age": 83,
+      "sex": "male",
+      "diagnosis": "mucosal melanoma",
+      "stage": null,
+      "prior_therapies": ["ipilimumab", "nivolumab"],
+      "biomarkers": ["BRAF wild-type", "NRAS wild-type", "PD-L1 negative"],
+      "performance_status": "ECOG 2",
+      "comorbidities": ["chronic obstructive pulmonary disease", "coronary artery disease", "chronic kidney disease stage 3"],
+      "location": "Pittsburgh, PA"
+    },
+    "difficulty": "hard",
+    "notes": "Mucosal melanoma is rare. Elderly with multiple comorbidities. Treatment intolerance. No targetable mutations. CABG implies severe CAD."
+  },
+  {
+    "id": "EVAL-031",
+    "input": "61-year-old man with BRAF V600E-positive cutaneous melanoma, initially stage IIIB. Underwent surgical resection with clear margins and completed one year of adjuvant dabrafenib plus trametinib. Now, 18 months later, has developed a solitary brain metastasis. LDH normal. ECOG 0. No comorbidities. In Scottsdale, AZ.",
+    "expected_profile": {
+      "age": 61,
+      "sex": "male",
+      "diagnosis": "melanoma",
+      "stage": "IV",
+      "prior_therapies": ["surgical resection", "dabrafenib", "trametinib"],
+      "biomarkers": ["BRAF V600E", "LDH normal"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Scottsdale, AZ"
+    },
+    "difficulty": "medium",
+    "notes": "Recurrence after adjuvant targeted therapy re-stages to IV. Solitary brain met could be considered for local therapy. Prior BRAF-targeted therapy raises question of re-challenge."
+  },
+  {
+    "id": "EVAL-032",
+    "input": "74-year-old man with metastatic castration-resistant prostate cancer. He's been through the works - initially had radical prostatectomy, then ADT when his PSA started rising, then Zytiga with prednisone, and most recently Xtandi. Now his PSA is climbing again. Gleason was 4+5=9 at diagnosis. Has bone mets throughout the spine and pelvis. Germline BRCA2 mutation was found. ECOG 1. Also has type 2 diabetes and prior DVT on Xarelto. In Detroit.",
+    "expected_profile": {
+      "age": 74,
+      "sex": "male",
+      "diagnosis": "prostate cancer",
+      "stage": "IV",
+      "prior_therapies": ["radical prostatectomy", "androgen deprivation therapy", "abiraterone", "enzalutamide"],
+      "biomarkers": ["BRCA2 germline mutation", "Gleason 9 (4+5)"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["type 2 diabetes", "deep vein thrombosis"],
+      "location": "Detroit, MI"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple brand names (Zytiga, Xtandi, Xarelto). mCRPC requires understanding of disease state. BRCA2 opens PARP inhibitor options. Informal tone (been through the works)."
+  },
+  {
+    "id": "EVAL-033",
+    "input": "68 yo male, mCRPC with visceral mets (liver). He was on Lupron and Erleada but progressed. Then got docetaxel x10 cycles. Now post-docetaxel. AR-V7 positive on circulating tumor cell assay. ECOG 2. Anemia requiring transfusions. Lives in Sacramento.",
+    "expected_profile": {
+      "age": 68,
+      "sex": "male",
+      "diagnosis": "prostate cancer",
+      "stage": "IV",
+      "prior_therapies": ["leuprolide", "apalutamide", "docetaxel"],
+      "biomarkers": ["AR-V7 positive"],
+      "performance_status": "ECOG 2",
+      "comorbidities": ["anemia"],
+      "location": "Sacramento, CA"
+    },
+    "difficulty": "hard",
+    "notes": "mCRPC abbreviation. Multiple brand names (Lupron, Erleada). AR-V7 is a resistance biomarker. Visceral mets are poor prognosis. Post-docetaxel setting."
+  },
+  {
+    "id": "EVAL-034",
+    "input": "56-year-old male recently diagnosed with high-risk localized prostate cancer. Gleason 4+4=8, PSA 22, clinical stage T2c. No evidence of metastatic disease on PSMA PET scan. Planning radical prostatectomy. No prior therapy. ECOG 0. No significant PMH. In Raleigh, NC.",
+    "expected_profile": {
+      "age": 56,
+      "sex": "male",
+      "diagnosis": "prostate cancer",
+      "stage": "T2c",
+      "prior_therapies": [],
+      "biomarkers": ["Gleason 8 (4+4)", "PSA 22"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Raleigh, NC"
+    },
+    "difficulty": "easy",
+    "notes": "Treatment-naive localized prostate cancer. Clinical staging with T-stage notation. PSA as biomarker."
+  },
+  {
+    "id": "EVAL-035",
+    "input": "62-year-old man with metastatic castration-sensitive prostate cancer, extensive disease per CHAARTED criteria. Bone and lymph node mets. Starting ADT plus docetaxel plus Nubeqa. Gleason 5+4=9. ECOG 1. Has COPD requiring home O2 intermittently. In Louisville, KY.",
+    "expected_profile": {
+      "age": 62,
+      "sex": "male",
+      "diagnosis": "prostate cancer",
+      "stage": "IV",
+      "prior_therapies": ["androgen deprivation therapy", "docetaxel", "darolutamide"],
+      "biomarkers": ["Gleason 9 (5+4)"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["chronic obstructive pulmonary disease"],
+      "location": "Louisville, KY"
+    },
+    "difficulty": "medium",
+    "notes": "Castration-sensitive (not resistant) prostate cancer. Nubeqa brand name for darolutamide. CHAARTED criteria reference. Significant pulmonary comorbidity."
+  },
+  {
+    "id": "EVAL-036",
+    "input": "71 year old gentleman, mCRPC. Received Xofigo for bone-predominant disease after enzalutamide. Now he has new lung lesions. No actionable somatic mutations on Foundation One CDx. MSI-stable. TMB low. PSA doubling time is very short - about 3 weeks. ECOG 1. Hypothyroidism. In Kansas City.",
+    "expected_profile": {
+      "age": 71,
+      "sex": "male",
+      "diagnosis": "prostate cancer",
+      "stage": "IV",
+      "prior_therapies": ["enzalutamide", "radium-223"],
+      "biomarkers": ["microsatellite stable", "TMB low", "no actionable somatic mutations"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["hypothyroidism"],
+      "location": "Kansas City, MO"
+    },
+    "difficulty": "hard",
+    "notes": "Xofigo brand name for radium-223. Foundation One CDx is a testing platform, not a result. TMB low is relevant for immunotherapy decisions. mCRPC abbreviation."
+  },
+  {
+    "id": "EVAL-037",
+    "input": "71-year-old woman presenting with newly diagnosed acute myeloid leukemia, intermediate-risk cytogenetics with NPM1 mutation and FLT3-ITD positive (allelic ratio 0.6). WBC 45k at presentation. She was deemed fit for intensive induction and received 7+3 (cytarabine plus daunorubicin). Day 14 bone marrow showed persistent disease. ECOG 1. History of prior breast cancer treated with chemo 8 years ago (in remission). In Rochester, MN.",
+    "expected_profile": {
+      "age": 71,
+      "sex": "female",
+      "diagnosis": "acute myeloid leukemia",
+      "stage": null,
+      "prior_therapies": ["cytarabine", "daunorubicin"],
+      "biomarkers": ["NPM1 mutation", "FLT3-ITD positive"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["history of breast cancer"],
+      "location": "Rochester, MN"
+    },
+    "difficulty": "hard",
+    "notes": "AML has no staging system. 7+3 regimen abbreviation. FLT3-ITD with allelic ratio. Prior malignancy as comorbidity. Complex cytogenetics."
+  },
+  {
+    "id": "EVAL-038",
+    "input": "66-year-old male with CLL, Rai stage IV. He has del(17p) and TP53 mutation by FISH and sequencing. He was initially treated with Imbruvica for 2 years but developed A-fib and had to stop. Then switched to Venclexta plus Gazyva - completed the 12-month fixed duration course. Now relapsing with rising lymphocyte count. ECOG 1. Also has mild hepatic impairment. In Ann Arbor, MI.",
+    "expected_profile": {
+      "age": 66,
+      "sex": "male",
+      "diagnosis": "chronic lymphocytic leukemia",
+      "stage": "Rai IV",
+      "prior_therapies": ["ibrutinib", "venetoclax", "obinutuzumab"],
+      "biomarkers": ["del(17p)", "TP53 mutation"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["atrial fibrillation", "hepatic impairment"],
+      "location": "Ann Arbor, MI"
+    },
+    "difficulty": "hard",
+    "notes": "Multiple brand names (Imbruvica, Venclexta, Gazyva). CLL has its own staging system (Rai). del(17p) and TP53 are high-risk features. Treatment intolerance to BTK inhibitor."
+  },
+  {
+    "id": "EVAL-039",
+    "input": "53-year-old male diagnosed with DLBCL, stage IIIA, germinal center B-cell subtype by Hans algorithm. IPI score 3 (high-intermediate). He completed 6 cycles of R-CHOP and achieved a complete metabolic response on PET-CT. Now 4 months later, PET shows new FDG-avid nodes. MYC and BCL2 both rearranged - double-hit lymphoma. ECOG 1. No comorbidities. In Madison, WI.",
+    "expected_profile": {
+      "age": 53,
+      "sex": "male",
+      "diagnosis": "diffuse large B-cell lymphoma",
+      "stage": "IIIA",
+      "prior_therapies": ["rituximab", "cyclophosphamide", "doxorubicin", "vincristine", "prednisone"],
+      "biomarkers": ["germinal center B-cell subtype", "MYC rearrangement", "BCL2 rearrangement", "double-hit"],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": "Madison, WI"
+    },
+    "difficulty": "hard",
+    "notes": "R-CHOP abbreviation must be expanded to 5 drugs. Double-hit lymphoma is high-risk. DLBCL abbreviation. IPI score is prognostic. Complex molecular characterization."
+  },
+  {
+    "id": "EVAL-040",
+    "input": "69-year-old woman with relapsed/refractory multiple myeloma. She's had three prior lines: VRd (Velcade/Revlimid/dex) upfront, then Dara-Pd (Darzalex/pomalid/dex) second line, and most recently Carvykti (cilta-cel, a BCMA CAR-T). Relapsed 6 months post CAR-T. High-risk cytogenetics: t(4;14) and gain 1q. ECOG 2. Has spinal compression fractures causing chronic pain. In Omaha, NE.",
+    "expected_profile": {
+      "age": 69,
+      "sex": "female",
+      "diagnosis": "multiple myeloma",
+      "stage": null,
+      "prior_therapies": ["bortezomib", "lenalidomide", "dexamethasone", "daratumumab", "pomalidomide", "ciltacabtagene autoleucel"],
+      "biomarkers": ["t(4;14)", "gain 1q"],
+      "performance_status": "ECOG 2",
+      "comorbidities": ["spinal compression fractures"],
+      "location": "Omaha, NE"
+    },
+    "difficulty": "hard",
+    "notes": "Extremely abbreviation-heavy (VRd, Dara-Pd). Multiple brand names (Velcade, Revlimid, Darzalex, Carvykti). CAR-T therapy. High-risk cytogenetics. Multiple myeloma has no traditional staging in relapsed setting."
+  },
+  {
+    "id": "EVAL-041",
+    "input": "24-year-old male with classical Hodgkin lymphoma, stage IIB with bulky mediastinal disease. Completed ABVD x6 cycles plus involved-site radiation therapy. PET-CT at end of treatment was Deauville 1 - complete response. Now, 8 months later, presents with B symptoms and new PET-avid supraclavicular nodes. ECOG 0. No comorbidities. In Columbus, OH.",
+    "expected_profile": {
+      "age": 24,
+      "sex": "male",
+      "diagnosis": "Hodgkin lymphoma",
+      "stage": "IIB",
+      "prior_therapies": ["doxorubicin", "bleomycin", "vinblastine", "dacarbazine", "radiation"],
+      "biomarkers": [],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Columbus, OH"
+    },
+    "difficulty": "medium",
+    "notes": "ABVD abbreviation must be expanded. Young patient with relapsed Hodgkin. Deauville scoring system. B symptoms indicate symptomatic disease."
+  },
+  {
+    "id": "EVAL-042",
+    "input": "58-year-old man with borderline resectable pancreatic ductal adenocarcinoma, head of pancreas. CA 19-9 is 850 U/mL. KRAS G12V mutation detected. He completed neoadjuvant FOLFIRINOX x8 cycles with good response, then underwent Whipple procedure (R0 resection). Now starting adjuvant gemcitabine/capecitabine. ECOG 1. History of new-onset diabetes (likely paraneoplastic). In Indianapolis, IN.",
+    "expected_profile": {
+      "age": 58,
+      "sex": "male",
+      "diagnosis": "pancreatic cancer",
+      "stage": null,
+      "prior_therapies": ["fluorouracil", "leucovorin", "irinotecan", "oxaliplatin", "pancreaticoduodenectomy", "gemcitabine", "capecitabine"],
+      "biomarkers": ["KRAS G12V", "CA 19-9 850 U/mL"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["diabetes"],
+      "location": "Indianapolis, IN"
+    },
+    "difficulty": "hard",
+    "notes": "FOLFIRINOX abbreviation. Whipple procedure is pancreaticoduodenectomy. Borderline resectable is a clinical designation, not a stage. CA 19-9 as tumor marker. Paraneoplastic diabetes."
+  },
+  {
+    "id": "EVAL-043",
+    "input": "63-year-old woman with stage IIIC high-grade serous ovarian cancer. She had optimal debulking surgery (no residual disease) and completed 6 cycles of IV carboplatin/paclitaxel plus IP cisplatin. Germline BRCA1 mutation positive. Now in first complete remission on maintenance Zejula. ECOG 0. No significant comorbidities. In Durham, NC.",
+    "expected_profile": {
+      "age": 63,
+      "sex": "female",
+      "diagnosis": "ovarian cancer",
+      "stage": "IIIC",
+      "prior_therapies": ["debulking surgery", "carboplatin", "paclitaxel", "cisplatin", "niraparib"],
+      "biomarkers": ["BRCA1 germline mutation", "high-grade serous"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Durham, NC"
+    },
+    "difficulty": "medium",
+    "notes": "Zejula brand name for niraparib. IP (intraperitoneal) route of administration. BRCA1 relevant for PARP inhibitor maintenance. Histologic subtype as biomarker."
+  },
+  {
+    "id": "EVAL-044",
+    "input": "71-year-old male with clear cell renal cell carcinoma, stage IV with lung and adrenal metastases. IMDC intermediate risk. He received first-line Opdivo plus Yervoy x4 doses, then maintenance Opdivo for one year. Now progressing. Has had a prior nephrectomy. ECOG 1. History of hypertension and gout. In Tucson, AZ.",
+    "expected_profile": {
+      "age": 71,
+      "sex": "male",
+      "diagnosis": "renal cell carcinoma",
+      "stage": "IV",
+      "prior_therapies": ["nephrectomy", "nivolumab", "ipilimumab"],
+      "biomarkers": ["clear cell histology", "IMDC intermediate risk"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["hypertension", "gout"],
+      "location": "Tucson, AZ"
+    },
+    "difficulty": "medium",
+    "notes": "RCC with IMDC risk category. Brand names (Opdivo, Yervoy). Clear cell subtype is prognostically relevant. IMDC risk stratification."
+  },
+  {
+    "id": "EVAL-045",
+    "input": "55-year-old man with hepatocellular carcinoma, BCLC stage C. He has underlying hepatitis C cirrhosis (SVR achieved, now virus-free, but Child-Pugh B7). Portal vein tumor thrombus present. AFP is 12,000 ng/mL. Started on Tecentriq plus Avastin but had a variceal bleed requiring banding. Then switched to Nexavar. Now progressing. ECOG 1. In El Paso, TX.",
+    "expected_profile": {
+      "age": 55,
+      "sex": "male",
+      "diagnosis": "hepatocellular carcinoma",
+      "stage": "BCLC C",
+      "prior_therapies": ["atezolizumab", "bevacizumab", "sorafenib"],
+      "biomarkers": ["AFP 12000 ng/mL"],
+      "performance_status": "ECOG 1",
+      "comorbidities": ["hepatitis C cirrhosis", "portal vein tumor thrombus"],
+      "location": "El Paso, TX"
+    },
+    "difficulty": "hard",
+    "notes": "HCC-specific staging (BCLC). Multiple brand names (Tecentriq, Avastin, Nexavar). Cirrhosis with Child-Pugh score. Treatment complication (variceal bleed). AFP as tumor marker."
+  },
+  {
+    "id": "EVAL-046",
+    "input": "49-year-old woman with a gastrointestinal stromal tumor of the stomach, high-risk by Miettinen criteria. KIT exon 11 mutation positive. She had R0 resection and completed 3 years of adjuvant Gleevec. Now, 1 year off therapy, has developed peritoneal metastases. ECOG 0. No comorbidities. In Salt Lake City, UT.",
+    "expected_profile": {
+      "age": 49,
+      "sex": "female",
+      "diagnosis": "gastrointestinal stromal tumor",
+      "stage": "IV",
+      "prior_therapies": ["surgical resection", "imatinib"],
+      "biomarkers": ["KIT exon 11 mutation"],
+      "performance_status": "ECOG 0",
+      "comorbidities": [],
+      "location": "Salt Lake City, UT"
+    },
+    "difficulty": "medium",
+    "notes": "GIST is a rare sarcoma. Gleevec brand name for imatinib. KIT mutation drives treatment selection. Miettinen risk stratification."
+  },
+  {
+    "id": "EVAL-047",
+    "input": "I have this 8-year-old girl with a newly diagnosed posterior fossa medulloblastoma. MRI shows a large fourth ventricle mass with obstructive hydrocephalus. Staging workup including spine MRI and CSF cytology are negative - so localized disease. She had a near-total resection. Molecular subtype is SHH (TP53 wild-type). No prior treatment other than surgery. She is doing well post-operatively, able to attend school part-time.",
+    "expected_profile": {
+      "age": 8,
+      "sex": "female",
+      "diagnosis": "medulloblastoma",
+      "stage": null,
+      "prior_therapies": ["near-total resection"],
+      "biomarkers": ["SHH subtype", "TP53 wild-type"],
+      "performance_status": null,
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Pediatric edge case. No standard ECOG/KPS. Rare CNS tumor with molecular subtyping. Staging is non-standard (localized vs metastatic). Functional status described narratively."
+  },
+  {
+    "id": "EVAL-048",
+    "input": "94-year-old man, found to have a lung mass on chest X-ray done for pneumonia. Biopsy confirmed adenocarcinoma. He lives in assisted living, is hard of hearing, uses a walker, and his daughter makes medical decisions. No molecular testing has been done. No staging scans beyond the CXR. He's not sure he wants any treatment.",
+    "expected_profile": {
+      "age": 94,
+      "sex": "male",
+      "diagnosis": "non-small cell lung cancer",
+      "stage": null,
+      "prior_therapies": [],
+      "biomarkers": [],
+      "performance_status": null,
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Very elderly edge case. Minimal clinical information. No staging, no molecular testing, no performance status score. Functional status implied (walker, assisted living) but not formally assessed."
+  },
+  {
+    "id": "EVAL-049",
+    "input": "Patient is a 42-year-old male. The note says metastatic melanoma but the path report says poorly differentiated carcinoma. He was treated with Keytruda for 6 cycles. Some notes say stage III and others say stage IV. His PD-L1 is listed as both 5% and 50% in different reports. BRAF testing was done but the result is pending. ECOG 1. Lives in Memphis.",
+    "expected_profile": {
+      "age": 42,
+      "sex": "male",
+      "diagnosis": "poorly differentiated carcinoma",
+      "stage": null,
+      "prior_therapies": ["pembrolizumab"],
+      "biomarkers": [],
+      "performance_status": "ECOG 1",
+      "comorbidities": [],
+      "location": "Memphis, TN"
+    },
+    "difficulty": "hard",
+    "notes": "Contradictory information edge case. Conflicting diagnosis (melanoma vs carcinoma). Conflicting stage (III vs IV). Conflicting PD-L1 values. Pending biomarker result. Tests handling of unreliable data."
+  },
+  {
+    "id": "EVAL-050",
+    "input": "New patient referral. 37F. Breast mass. That's all we have so far.",
+    "expected_profile": {
+      "age": 37,
+      "sex": "female",
+      "diagnosis": "breast mass",
+      "stage": null,
+      "prior_therapies": [],
+      "biomarkers": [],
+      "performance_status": null,
+      "comorbidities": [],
+      "location": null
+    },
+    "difficulty": "hard",
+    "notes": "Minimal information edge case. No confirmed cancer diagnosis. Tests system behavior with extremely sparse input. Many null/empty fields expected."
+  }
+]
