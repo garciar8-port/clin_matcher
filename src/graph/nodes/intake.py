@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
@@ -9,6 +11,8 @@ from langsmith import traceable
 from src.graph.state import Clarification, PatientProfile, TrialMatchState
 from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM, INTAKE_VERSION
 from src.utils.retry import llm_retry
+
+logger = logging.getLogger(__name__)
 
 MAX_INPUT_LENGTH = 5_000
 
@@ -22,7 +26,7 @@ async def _extract_profile(messages: list) -> PatientProfile:
 
 
 @traceable(name="intake_agent", metadata={"node_type": "extraction", "prompt_version": INTAKE_VERSION})
-async def intake_node(state: TrialMatchState) -> dict:
+async def intake_node(state: TrialMatchState, store=None) -> dict:
     raw_input = state["raw_input"]
 
     # Merge clarification responses into the input if present
@@ -61,6 +65,18 @@ async def intake_node(state: TrialMatchState) -> dict:
             ],
             "current_node": "intake_agent",
         }
+
+    # Save profile to Store for cross-session recall (CRE-33)
+    if store:
+        try:
+            user_id = state.get("metadata", {}).get("user_id", "anonymous")
+            store.put(
+                ("users", user_id, "patients"),
+                f"{profile.age}_{profile.diagnosis}",
+                {"profile": profile.model_dump(), "raw_input": state["raw_input"]},
+            )
+        except Exception as e:
+            logger.warning("Failed to save profile to store: %s", e)
 
     return {
         "patient_profile": profile,

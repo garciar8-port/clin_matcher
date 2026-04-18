@@ -7,6 +7,7 @@ import os
 
 from langgraph.graph import END, START, StateGraph
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.store.memory import InMemoryStore
 
 from src.graph.state import TrialMatchState
 from src.graph.nodes.intake import intake_node
@@ -79,6 +80,7 @@ builder.add_conditional_edges(
 )
 # human_review uses Command(goto=...) for dynamic re-entry — no static edge needed
 
-# Compile
+# Compile with checkpointer and store
 checkpointer = _create_checkpointer()
-graph = builder.compile(checkpointer=checkpointer)
+store = InMemoryStore()
+graph = builder.compile(checkpointer=checkpointer, store=store)
