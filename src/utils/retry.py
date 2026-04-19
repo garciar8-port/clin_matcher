@@ -27,8 +27,8 @@ def _log_retry(retry_state: RetryCallState) -> None:
 
 
 llm_retry = retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential_jitter(initial=1, max=30, jitter=2),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential_jitter(initial=2, max=60, jitter=5),
     before_sleep=_log_retry,
     reraise=True,
 )

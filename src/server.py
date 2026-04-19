@@ -11,6 +11,7 @@ Provides REST + SSE endpoints for the frontend:
 from __future__ import annotations
 
 import json
+import os
 import uuid
 from contextlib import asynccontextmanager
 
@@ -20,22 +21,35 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.store.memory import InMemoryStore
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.store.postgres import AsyncPostgresStore
+from psycopg_pool import AsyncConnectionPool
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
 
 from src.graph.graph import builder
 
-# Compile graph with persistence for interrupt/resume
-checkpointer = MemorySaver()
-store = InMemoryStore()
-graph = builder.compile(checkpointer=checkpointer, store=store)
+DB_URI = os.environ["DATABASE_URL"]
+
+# Will be set during lifespan
+graph = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    yield
+    global graph
+    async with AsyncConnectionPool(
+        DB_URI,
+        min_size=1,
+        max_size=5,
+        kwargs={"autocommit": True, "prepare_threshold": 0},
+    ) as pool:
+        checkpointer = AsyncPostgresSaver(conn=pool)
+        store = AsyncPostgresStore(conn=pool)
+        await checkpointer.setup()
+        await store.setup()
+        graph = builder.compile(checkpointer=checkpointer, store=store)
+        yield
 
 
 app = FastAPI(title="Clinical Trial Matcher API", lifespan=lifespan)

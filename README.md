@@ -121,13 +121,12 @@ docker compose up
 | LLM — Reasoning | Claude Sonnet 4.6 |
 | Data Source | ClinicalTrials.gov API v2 |
 | Frontend | Next.js 16 + TypeScript + Tailwind |
-| API Client | LangGraph SDK (SSE streaming) |
-| Persistence | MemorySaver (dev) / PostgresSaver (prod) |
-| Cross-session Memory | LangGraph Store |
+| API Server | FastAPI (SSE streaming) |
+| Persistence | AsyncPostgresSaver + AsyncPostgresStore (Neon) |
 | Retry / Resilience | Tenacity (exponential jitter) |
 | Observability | LangSmith (tracing, evals) |
 | CI | GitHub Actions (tests + eval gating) |
-| Prompt Management | Versioned registry with LangSmith metadata |
+| Deployment | Google Cloud Run |
 
 ---
 
@@ -160,15 +159,15 @@ python -m src.eval.run_evals --evaluator extraction
 
 ```
 clin_matcher/
-  langgraph.json                # LangGraph Platform config
   pyproject.toml                # Dependencies
   Dockerfile                    # Multi-stage production build
-  docker-compose.yml            # Postgres + app
+  docker-compose.yml            # Postgres + app (local dev)
   src/
+    server.py                   # FastAPI server (SSE streaming)
     __main__.py                 # CLI with multi-mode streaming
     graph/
       state.py                  # Pydantic data models + TrialMatchState
-      graph.py                  # StateGraph, routing, checkpointer, store
+      graph.py                  # StateGraph, routing, conditional edges
       nodes/
         intake.py               # Profile extraction + Store persistence
         search.py               # CT.gov API with tenacity retry
@@ -179,7 +178,6 @@ clin_matcher/
       intake.py                 # Extraction prompts (v1.1)
       eligibility.py            # Criterion evaluation prompts (v1.1)
       ranker.py                 # Match summary prompts (v1.1)
-      registry.py               # Versioned prompt registry
     tools/
       clinical_trials_api.py    # CT.gov v2 async client + 24hr cache
     utils/
@@ -192,6 +190,7 @@ clin_matcher/
   docs/
     targets.md                  # SLO targets (quality, latency, cost)
   frontend/
+    Dockerfile                  # Next.js standalone production build
     src/
       app/page.tsx              # Single-page app with state machine
       components/
@@ -199,8 +198,10 @@ clin_matcher/
         ProgressIndicator.tsx    # 4-step pipeline progress
         TrialCard.tsx            # Ranked result cards with criteria details
         ClarificationForm.tsx    # Human-in-the-loop question UI
+        TraceViewer.tsx          # Execution trace viewer
+        Header.tsx               # App header
       lib/
-        api.ts                  # LangGraph Platform SDK client
+        api.ts                  # FastAPI backend client (SSE)
         types.ts                # TypeScript types matching Python models
 ```
 
@@ -216,8 +217,8 @@ clin_matcher/
 | **`interrupt()` + `Command(goto=...)`** | Dynamic re-entry lets any node request clarification without hardcoded return edges |
 | **Deterministic scoring** | Auditable weighted formula; LLM generates summaries not scores |
 | **Tenacity retry with jitter** | Resilient to transient API failures (CT.gov + Claude) |
-| **Prompt versioning registry** | Versions logged to LangSmith metadata for experiment tracking |
-| **Conditional checkpointer** | MemorySaver in dev, PostgresSaver when DATABASE_URL is set |
+| **AsyncPostgresStore** | Persistent cross-session memory via Neon Postgres, survives container restarts |
+| **Cloud Run deployment** | Backend + frontend as separate services, secrets via GCloud Secret Manager |
 
 ---
 

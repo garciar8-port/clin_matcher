@@ -12,14 +12,16 @@ interface ProgressIndicatorProps {
   completedNodes: string[];
 }
 
-export default function ProgressIndicator({ currentNode, completedNodes }: ProgressIndicatorProps) {
+export default function ProgressIndicator({ completedNodes }: ProgressIndicatorProps) {
+  const nextStepIdx = STEPS.findIndex((step) => !completedNodes.includes(step.node));
+
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium text-gray-700">Processing...</p>
       <div className="space-y-2">
-        {STEPS.map((step) => {
+        {STEPS.map((step, idx) => {
           const isCompleted = completedNodes.includes(step.node);
-          const isActive = currentNode === step.node && !isCompleted;
+          const isActive = idx === nextStepIdx;
 
           return (
             <div key={step.node} className="flex items-center gap-3">
