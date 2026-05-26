@@ -105,6 +105,11 @@ def _parse_trial(study: dict) -> Trial:
     sex = eligibility.get("sex", "ALL")
     healthy_volunteers = eligibility.get("healthyVolunteers", False)
 
+    # Design fields
+    study_type = design.get("studyType", "")
+    design_info = design.get("designInfo", {})
+    primary_purpose = design_info.get("primaryPurpose", "")
+
     # Sponsor
     lead = sponsor_mod.get("leadSponsor", {})
     sponsor = lead.get("name", "Unknown")
@@ -124,6 +129,8 @@ def _parse_trial(study: dict) -> Trial:
         maximum_age=max_age,
         sex=sex,
         healthy_volunteers=healthy_volunteers,
+        study_type=study_type,
+        primary_purpose=primary_purpose,
     )
 
 

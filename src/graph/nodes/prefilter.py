@@ -1,6 +1,7 @@
 """Pre-filter — deterministic screening of trials before LLM evaluation.
 
 Drops obviously ineligible trials using structured CT.gov fields (no LLM calls):
+- Non-interventional or non-treatment studies
 - Age outside trial's min/max age
 - Sex mismatch
 - Condition keyword mismatch
@@ -18,6 +19,13 @@ from src.graph.state import PatientProfile, Trial, TrialMatchState
 logger = logging.getLogger(__name__)
 
 MAX_TRIALS_AFTER_FILTER = 10
+
+
+def _check_study_type(trial: Trial) -> bool:
+    """Return False if trial is not one a patient could enroll in."""
+    if trial.primary_purpose in ("BASIC_SCIENCE", "HEALTH_SERVICES_RESEARCH"):
+        return False
+    return True
 
 
 def _check_age(profile: PatientProfile, trial: Trial) -> bool:
@@ -74,6 +82,8 @@ async def prefilter_node(state: TrialMatchState) -> dict:
 
     for trial in trials:
         reasons = []
+        if not _check_study_type(trial):
+            reasons.append(f"study_type({trial.study_type}/{trial.primary_purpose})")
         if not _check_age(profile, trial):
             reasons.append(f"age({trial.minimum_age}-{trial.maximum_age})")
         if not _check_sex(profile, trial):

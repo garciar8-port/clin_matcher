@@ -41,6 +41,8 @@ class Trial(BaseModel):
     maximum_age: int | None = None
     sex: str = "ALL"  # "ALL", "FEMALE", "MALE"
     healthy_volunteers: bool = False
+    study_type: str = ""  # "INTERVENTIONAL", "OBSERVATIONAL", etc.
+    primary_purpose: str = ""  # "TREATMENT", "DIAGNOSTIC", "PREVENTION", etc.
 
 
 class CriterionResult(BaseModel):
@@ -71,6 +73,7 @@ class RankedTrial(BaseModel):
     score: float
     match_summary: str
     evaluation: TrialEvaluation
+    sponsor: str = ""
 
 
 class Clarification(BaseModel):

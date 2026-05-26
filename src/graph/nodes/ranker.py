@@ -33,13 +33,13 @@ def _recency_score(trial: Trial) -> float:
 
 
 def _score(evaluation: TrialEvaluation, trial: Trial) -> float:
-    """Compute a weighted match score for a trial."""
-    total_criteria = (
-        len(evaluation.criteria_met)
-        + len(evaluation.criteria_failed)
-        + len(evaluation.criteria_uncertain)
-    )
-    criteria_score = len(evaluation.criteria_met) / max(total_criteria, 1)
+    """Compute a weighted match score for a trial.
+
+    Uncertain criteria (insufficient info) are excluded from the score —
+    only criteria with enough data to determine met/failed count.
+    """
+    determined = len(evaluation.criteria_met) + len(evaluation.criteria_failed)
+    criteria_score = len(evaluation.criteria_met) / max(determined, 1)
 
     phase_scores = {"PHASE3": 1.0, "PHASE2": 0.7, "PHASE1": 0.4}
     phase_key = trial.phase.upper().replace(" ", "")
@@ -153,6 +153,7 @@ async def ranker_node(state: TrialMatchState) -> dict:
                 score=round(score, 3),
                 match_summary=summary,
                 evaluation=ev,
+                sponsor=trial.sponsor,
             )
         )
 

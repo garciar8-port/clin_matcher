@@ -47,6 +47,7 @@ export interface RankedTrial {
   score: number;
   match_summary: string;
   evaluation: TrialEvaluation;
+  sponsor: string;
 }
 
 export interface Clarification {
