@@ -12,39 +12,67 @@ A production-grade multi-agent system built with **LangGraph** that matches pati
 Patient Description (free text)
         |
         v
-+---------------+     +---------------+     +--------------------+
-|   Intake      |---->|   Search      |---->|   Eligibility      |
-|   Agent       |     |   Agent       |     |   Evaluator        |
-|               |     |               |     |                    |
-| Claude Haiku  |     | CT.gov API v2 |     | Claude Sonnet      |
-| Extracts      |     | Fetches top   |     | Evaluates each     |
-| PatientProfile|     | 20 recruiting |     | criterion per trial|
-|               |     | trials        |     | via asyncio.gather |
-+-------+-------+     +---------------+     +---------+----------+
-        |                                              |
-        |  +---------------+     +---------------+     |
-        |  |   Human       |<----|   Ranker      |<----+
++---------------+     +---------------+     +---------------+
+|   Intake      |---->|   Search      |---->|  Pre-filter   |
+|   Agent       |     |   Agent       |     |               |
+|               |     |               |     | Deterministic |
+| Configurable  |     | CT.gov API v2 |     | Age, sex,     |
+| LLM (Groq)   |     | Fetches top   |     | study type,   |
+| Extracts      |     | 20 recruiting |     | condition     |
+| PatientProfile|     | trials        |     | checks        |
++-------+-------+     +---------------+     +-------+-------+
+        |                                           |
+        |                                           v
+        |                                   +--------------------+
+        |                                   |   Eligibility      |
+        |                                   |   Evaluator        |
+        |                                   |                    |
+        |                                   | Configurable LLM   |
+        |                                   | (Together/Llama)   |
+        |                                   | Parallel eval with |
+        |                                   | 30s timeout        |
+        |                                   +---------+----------+
+        |                                             |
+        |  +---------------+     +---------------+    |
+        |  |   Human       |<----|   Ranker      |<---+
         +->|   Review      |     |   Agent       |
            |               |     |               |
-           | interrupt()   |     | Claude Sonnet |
-           | Pauses for    |     | Scores, ranks,|
-           | clarification |     | summarizes    |
-           +---------------+     +-------+-------+
+           | interrupt()   |     | Configurable  |
+           | Pauses for    |     | LLM (Groq)   |
+           | clarification |     | Scores, ranks,|
+           +---------------+     | summarizes    |
+                                 +-------+-------+
                                          |
                                          v
                                   Ranked Trial Cards
                                   (Next.js Frontend)
 ```
 
-### The Five Agents
+### The Pipeline
 
-| Agent | Model | Role |
-|-------|-------|------|
-| **Intake Agent** | Claude Haiku 4.5 | Extracts structured `PatientProfile` from free text. Validates required fields. Routes to human review if critical data is missing. |
+| Step | Model/Method | Role |
+|------|-------------|------|
+| **Intake Agent** | Configurable (default: Groq/Llama 3.3 70B) | Extracts structured `PatientProfile` from free text. Validates required fields. Routes to human review if critical data is missing. |
 | **Search Agent** | Deterministic | Queries ClinicalTrials.gov API v2 for recruiting trials matching condition, stage, and location. 24-hour TTL cache. |
-| **Eligibility Evaluator** | Claude Sonnet 4.6 | Evaluates patient against every inclusion/exclusion criterion per trial in parallel. Three-valued logic: met / not met / uncertain. |
-| **Ranker Agent** | Claude Sonnet 4.6 | Filters ineligible trials, scores with weighted formula, generates plain-language match summaries. |
+| **Pre-filter** | Deterministic | Drops trials using structured CT.gov fields: age range, sex, study type (drops BASIC_SCIENCE, HEALTH_SERVICES_RESEARCH), and condition keyword mismatch. Caps at 10 trials. |
+| **Eligibility Evaluator** | Configurable (default: Together/Llama 3.3 70B) | Evaluates patient against every inclusion/exclusion criterion per trial in parallel. Three-valued logic: met / not met / uncertain. 30s per-trial timeout. |
+| **Ranker Agent** | Configurable (default: Groq/Llama 3.3 70B) | Filters ineligible trials, scores with weighted formula, generates plain-language match summaries. Displays trial sponsor. |
 | **Human Review** | Interrupt | Pauses via `interrupt()` + `Command(goto=...)` for dynamic re-entry when clarification is needed. |
+
+### Multi-Model Support
+
+Each pipeline node can use a different LLM provider, configured via environment variables:
+
+```
+INTAKE_MODEL_PROVIDER=groq          # anthropic | deepseek | groq | together
+INTAKE_MODEL_ID=llama-3.3-70b-versatile
+ELIGIBILITY_MODEL_PROVIDER=together
+ELIGIBILITY_MODEL_ID=meta-llama/Llama-3.3-70B-Instruct-Turbo
+RANKER_MODEL_PROVIDER=groq
+RANKER_MODEL_ID=llama-3.3-70b-versatile
+```
+
+Falls back to Claude Haiku if not configured.
 
 ### Scoring Formula
 
@@ -52,7 +80,7 @@ Patient Description (free text)
 score = 0.6 x criteria_met_ratio + 0.3 x phase_score + 0.1 x recency_score
 ```
 
-- **Criteria met ratio**: Proportion of eligibility criteria satisfied
+- **Criteria met ratio**: Proportion of determined criteria satisfied (uncertain criteria excluded from denominator)
 - **Phase score**: Phase 3 (1.0) > Phase 2 (0.7) > Phase 1 (0.4)
 - **Recency**: Linear decay over 365 days from last trial update
 
@@ -64,7 +92,7 @@ score = 0.6 x criteria_met_ratio + 0.3 x phase_score + 0.1 x recency_score
 
 - Python 3.11+
 - Node.js 22+ (for frontend)
-- [Anthropic API key](https://console.anthropic.com/)
+- API keys for at least one LLM provider (Groq, Together, DeepSeek, or Anthropic)
 - Docker (optional, for PostgresSaver)
 
 ### Backend
@@ -78,7 +106,8 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 
 cp .env.example .env
-# Add your ANTHROPIC_API_KEY and LANGSMITH_API_KEY
+# Add your API keys (GROQ_API_KEY, TOGETHER_API_KEY, etc.)
+# Configure model selection per node (see Multi-Model Support above)
 ```
 
 **Run via CLI:**
@@ -117,14 +146,13 @@ docker compose up
 | Layer | Technology |
 |-------|------------|
 | Agent Orchestration | LangGraph (StateGraph) |
-| LLM — Extraction | Claude Haiku 4.5 |
-| LLM — Reasoning | Claude Sonnet 4.6 |
+| LLM Providers | Groq, Together AI, DeepSeek, Anthropic (configurable per node) |
 | Data Source | ClinicalTrials.gov API v2 |
 | Frontend | Next.js 16 + TypeScript + Tailwind |
 | API Server | FastAPI (SSE streaming) |
 | Persistence | AsyncPostgresSaver + AsyncPostgresStore (Neon) |
 | Retry / Resilience | Tenacity (exponential jitter) |
-| Observability | LangSmith (tracing, evals) |
+| Observability | LangSmith (tracing with model provider metadata) |
 | CI | GitHub Actions (tests + eval gating) |
 | Deployment | Google Cloud Run |
 
@@ -136,7 +164,7 @@ docker compose up
 # Run all 62 unit + e2e tests (no API keys needed)
 pytest tests/ -v
 
-# Run evaluation suite (requires ANTHROPIC_API_KEY + LANGSMITH_API_KEY)
+# Run evaluation suite (requires LLM API key + LANGSMITH_API_KEY)
 python -m src.eval.run_evals
 
 # Run a single evaluator
@@ -163,6 +191,7 @@ clin_matcher/
   Dockerfile                    # Multi-stage production build
   docker-compose.yml            # Postgres + app (local dev)
   src/
+    models.py                   # Multi-model config (provider selection per node)
     server.py                   # FastAPI server (SSE streaming)
     __main__.py                 # CLI with multi-mode streaming
     graph/
@@ -171,7 +200,8 @@ clin_matcher/
       nodes/
         intake.py               # Profile extraction + Store persistence
         search.py               # CT.gov API with tenacity retry
-        eligibility.py          # Parallel criterion evaluation
+        prefilter.py            # Deterministic trial screening (age, sex, study type)
+        eligibility.py          # Parallel criterion evaluation with timeout
         ranker.py               # Scoring, ranking, summary generation
         human_review.py         # interrupt() + Command(goto=...)
     prompts/
@@ -196,7 +226,7 @@ clin_matcher/
       components/
         PatientInput.tsx         # Free-text input + example narratives
         ProgressIndicator.tsx    # 4-step pipeline progress
-        TrialCard.tsx            # Ranked result cards with criteria details
+        TrialCard.tsx            # Ranked result cards with sponsor + CT.gov links
         ClarificationForm.tsx    # Human-in-the-loop question UI
         TraceViewer.tsx          # Execution trace viewer
         Header.tsx               # App header
@@ -211,12 +241,14 @@ clin_matcher/
 
 | Decision | Rationale |
 |----------|-----------|
-| **Separate extraction and reasoning models** | Haiku for structured extraction at low cost; Sonnet for complex multi-criteria reasoning |
-| **Parallel eligibility evaluation** | `asyncio.gather()` across trials cuts latency proportionally |
+| **Multi-model support** | Configurable per node via env vars. Groq for fast single-call nodes, Together for parallel evaluation. Falls back to Claude Haiku. |
+| **Deterministic pre-filter** | Uses structured CT.gov fields (age, sex, study type) to drop ineligible trials before LLM evaluation — instant, no cost. |
+| **Uncertain criteria excluded from scoring** | Missing patient info doesn't penalize match score — only determined criteria count. |
+| **Parallel eligibility with timeout** | `asyncio.gather()` with 30s per-trial timeout. Timed-out trials marked "maybe" instead of blocking. |
 | **Three-valued eligibility** | "Uncertain" prevents hallucinated verdicts, triggers human review |
 | **`interrupt()` + `Command(goto=...)`** | Dynamic re-entry lets any node request clarification without hardcoded return edges |
 | **Deterministic scoring** | Auditable weighted formula; LLM generates summaries not scores |
-| **Tenacity retry with jitter** | Resilient to transient API failures (CT.gov + Claude) |
+| **Tenacity retry with jitter** | Resilient to transient API failures (CT.gov + LLM providers) |
 | **AsyncPostgresStore** | Persistent cross-session memory via Neon Postgres, survives container restarts |
 | **Cloud Run deployment** | Backend + frontend as separate services, secrets via GCloud Secret Manager |
 
