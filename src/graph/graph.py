@@ -7,6 +7,7 @@ from langgraph.graph import END, START, StateGraph
 from src.graph.nodes.eligibility import eligibility_node
 from src.graph.nodes.human_review import human_review_node
 from src.graph.nodes.intake import intake_node
+from src.graph.nodes.prefilter import prefilter_node
 from src.graph.nodes.ranker import ranker_node
 from src.graph.nodes.search import search_node
 from src.graph.state import TrialMatchState
@@ -33,6 +34,7 @@ builder = StateGraph(TrialMatchState)
 # Nodes
 builder.add_node("intake_agent", intake_node)
 builder.add_node("search_agent", search_node)
+builder.add_node("prefilter", prefilter_node)
 builder.add_node("eligibility_evaluator", eligibility_node)
 builder.add_node("ranker_agent", ranker_node)
 builder.add_node("human_review", human_review_node)
@@ -44,7 +46,8 @@ builder.add_conditional_edges(
     route_after_intake,
     {"search_agent": "search_agent", "human_review": "human_review"},
 )
-builder.add_edge("search_agent", "eligibility_evaluator")
+builder.add_edge("search_agent", "prefilter")
+builder.add_edge("prefilter", "eligibility_evaluator")
 builder.add_edge("eligibility_evaluator", "ranker_agent")
 builder.add_conditional_edges(
     "ranker_agent",

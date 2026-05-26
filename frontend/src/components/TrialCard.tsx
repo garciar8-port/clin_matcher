@@ -63,9 +63,23 @@ export default function TrialCard({ trial }: TrialCardProps) {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono text-gray-400">#{trial.rank}</span>
               <EligibilityBadge eligible={evaluation.eligible} />
-              <span className="text-xs text-gray-400">{evaluation.nct_id}</span>
+              <a
+                href={`https://clinicaltrials.gov/study/${evaluation.nct_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline"
+              >
+                {evaluation.nct_id}
+              </a>
             </div>
-            <h3 className="text-sm font-semibold text-gray-900 leading-snug">{trial.title}</h3>
+            <a
+              href={`https://clinicaltrials.gov/study/${evaluation.nct_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-gray-900 leading-snug hover:text-blue-700 hover:underline"
+            >
+              {trial.title}
+            </a>
           </div>
           <ScoreBadge score={trial.score} />
         </div>

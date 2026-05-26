@@ -1,6 +1,6 @@
 /** FastAPI backend client for thread and run management. */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8123";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function createThreadAndRun(
   patientText: string,

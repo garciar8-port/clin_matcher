@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 
@@ -15,10 +14,11 @@ from src.graph.state import (
     TrialEvaluation,
     TrialMatchState,
 )
+from src.models import get_model, get_model_info
 from src.prompts.ranker import RANKER_SUMMARY_HUMAN, RANKER_SUMMARY_SYSTEM, RANKER_VERSION
 from src.utils.retry import llm_retry
 
-llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
+llm = get_model("ranker")
 
 
 def _recency_score(trial: Trial) -> float:
@@ -117,7 +117,7 @@ async def _generate_summary(
     )
 
 
-@traceable(name="ranker_agent", metadata={"node_type": "llm_light", "prompt_version": RANKER_VERSION})
+@traceable(name="ranker_agent", metadata={"node_type": "llm_light", "prompt_version": RANKER_VERSION, **get_model_info("ranker")})
 async def ranker_node(state: TrialMatchState) -> dict:
     profile = state["patient_profile"]
     assert profile is not None

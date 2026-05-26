@@ -3,19 +3,23 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
-from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 from pydantic import BaseModel, Field
 
 from src.graph.state import CriterionResult, Trial, TrialEvaluation, TrialMatchState
+from src.models import get_model, get_model_info
 from src.prompts.eligibility import ELIGIBILITY_HUMAN, ELIGIBILITY_SYSTEM, ELIGIBILITY_VERSION
 from src.utils.retry import llm_retry
 
-MAX_TRIALS = 20
+logger = logging.getLogger(__name__)
 
-llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
+MAX_TRIALS = 20
+EVAL_TIMEOUT_SECONDS = 30
+
+llm = get_model("eligibility")
 
 
 class EligibilityOutput(BaseModel):
@@ -99,7 +103,7 @@ async def _evaluate_one(profile_json: str, trial: Trial) -> TrialEvaluation:
     return _build_evaluation(response, trial.nct_id)
 
 
-@traceable(name="eligibility_evaluator", metadata={"node_type": "llm_heavy", "prompt_version": ELIGIBILITY_VERSION})
+@traceable(name="eligibility_evaluator", metadata={"node_type": "llm_heavy", "prompt_version": ELIGIBILITY_VERSION, **get_model_info("eligibility")})
 async def eligibility_node(state: TrialMatchState) -> dict:
     profile = state["patient_profile"]
     assert profile is not None
@@ -113,16 +117,36 @@ async def eligibility_node(state: TrialMatchState) -> dict:
 
     profile_json = profile.model_dump_json(indent=2)
 
-    # Limit concurrency to avoid API rate limits
-    semaphore = asyncio.Semaphore(5)
+    semaphore = asyncio.Semaphore(10)
 
     async def _eval_with_limit(trial):
         async with semaphore:
-            return await _evaluate_one(profile_json, trial)
+            try:
+                return await asyncio.wait_for(
+                    _evaluate_one(profile_json, trial),
+                    timeout=EVAL_TIMEOUT_SECONDS,
+                )
+            except asyncio.TimeoutError:
+                logger.warning("Eligibility eval timed out for %s after %ds", trial.nct_id, EVAL_TIMEOUT_SECONDS)
+                return TrialEvaluation(
+                    nct_id=trial.nct_id,
+                    criteria_met=[],
+                    criteria_failed=[],
+                    criteria_uncertain=[CriterionResult(
+                        criterion_text="Evaluation timed out",
+                        met=None,
+                        reasoning=f"LLM evaluation exceeded {EVAL_TIMEOUT_SECONDS}s timeout",
+                    )],
+                    eligible="maybe",
+                    reasoning=f"Evaluation timed out after {EVAL_TIMEOUT_SECONDS}s — marked as uncertain",
+                )
 
     evaluations = await asyncio.gather(
         *[_eval_with_limit(trial) for trial in trials]
     )
+
+    completed = sum(1 for e in evaluations if e.reasoning and "timed out" not in e.reasoning)
+    logger.info("Eligibility: %d/%d trials completed within %ds", completed, len(trials), EVAL_TIMEOUT_SECONDS)
 
     return {
         "evaluations": list(evaluations),

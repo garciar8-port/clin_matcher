@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import logging
 
-from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 
 from src.graph.state import Clarification, PatientProfile, TrialMatchState
+from src.models import get_model, get_model_info
 from src.prompts.intake import INTAKE_HUMAN, INTAKE_SYSTEM, INTAKE_VERSION
 from src.utils.retry import llm_retry
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 MAX_INPUT_LENGTH = 5_000
 
-llm = ChatAnthropic(model="claude-haiku-4-5-20251001")
+llm = get_model("intake")
 structured_llm = llm.with_structured_output(PatientProfile)
 
 
@@ -25,7 +25,7 @@ async def _extract_profile(messages: list) -> PatientProfile:
     return await structured_llm.ainvoke(messages)
 
 
-@traceable(name="intake_agent", metadata={"node_type": "extraction", "prompt_version": INTAKE_VERSION})
+@traceable(name="intake_agent", metadata={"node_type": "extraction", "prompt_version": INTAKE_VERSION, **get_model_info("intake")})
 async def intake_node(state: TrialMatchState, store=None) -> dict:
     raw_input = state["raw_input"]
 
