@@ -33,6 +33,15 @@ def _set_cached(key: str, trials: list[Trial]) -> None:
     _cache[key] = (time.time(), trials)
 
 
+def _parse_age(age_str: str) -> int | None:
+    """Parse age string like '18 Years' into an integer."""
+    if not age_str:
+        return None
+    import re
+    match = re.search(r"(\d+)", age_str)
+    return int(match.group(1)) if match else None
+
+
 def _split_criteria(raw: str) -> tuple[str, str]:
     """Split eligibility criteria text into inclusion and exclusion sections."""
     raw = raw or ""
@@ -90,6 +99,12 @@ def _parse_trial(study: dict) -> Trial:
     criteria_text = eligibility.get("eligibilityCriteria", "")
     inclusion, exclusion = _split_criteria(criteria_text)
 
+    # Structured eligibility fields
+    min_age = _parse_age(eligibility.get("minimumAge", ""))
+    max_age = _parse_age(eligibility.get("maximumAge", ""))
+    sex = eligibility.get("sex", "ALL")
+    healthy_volunteers = eligibility.get("healthyVolunteers", False)
+
     # Sponsor
     lead = sponsor_mod.get("leadSponsor", {})
     sponsor = lead.get("name", "Unknown")
@@ -105,6 +120,10 @@ def _parse_trial(study: dict) -> Trial:
         exclusion_criteria=exclusion,
         locations=locations,
         last_updated=status_mod.get("lastUpdatePostDate", {}).get("date", ""),
+        minimum_age=min_age,
+        maximum_age=max_age,
+        sex=sex,
+        healthy_volunteers=healthy_volunteers,
     )
 
 

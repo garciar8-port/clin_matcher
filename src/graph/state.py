@@ -36,6 +36,11 @@ class Trial(BaseModel):
     exclusion_criteria: str
     locations: list[dict] = []  # {facility, city, state, country}
     last_updated: str
+    # Structured eligibility fields from CT.gov API
+    minimum_age: int | None = None
+    maximum_age: int | None = None
+    sex: str = "ALL"  # "ALL", "FEMALE", "MALE"
+    healthy_volunteers: bool = False
 
 
 class CriterionResult(BaseModel):
